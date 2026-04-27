@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "lurii-finance": {
+      "command": "pfm-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}

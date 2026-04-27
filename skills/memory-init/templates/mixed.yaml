@@ -1,0 +1,58 @@
+archetype: mixed
+description: Balanced multi-asset portfolio. ETFs + individual stocks + crypto + stablecoin yield. Cross-border income/expenses common.
+
+profile:
+  region_options: [US resident, EU resident, UK resident, Asia non-resident, LATAM resident, Digital nomad, Other]
+  goal_options: [FIRE, Retirement at standard age, Wealth growth, Income replacement]
+  horizon_options: ["<5y", "5-10y", "10-15y", "15-25y", "25y+"]
+  risk_options: [Moderate, Aggressive, Very aggressive]
+  experience_options: ["<2y", "2-5y", "5-10y", "10y+"]
+  base_currency_default: USD
+  foreign_currencies_examples: [EUR, GBP, THB, JPY, RUB, BRL, AED]
+  income_monthly_usd_options: ["<3000", "3000-6000", "6000-10000", "10000+", "Other"]
+  invest_monthly_usd_options: ["<1000", "1000-3000", "3000-5000", "Other"]
+  expenses_monthly_usd_options: ["<2000", "2000-4000", "4000-7000", "Other"]
+  buffer_amount_options: ["<5000", "5000-10000", "10000-20000", "Other"]
+  portfolio_size_usd_options: ["<25000", "25000-100000", "100000-500000", "500000+"]
+  rebalance_cadence_options: [Monthly, Quarterly, Ad_hoc, Never]
+
+targets:
+  template_targets:
+    - {asset: VTI, weight_pct: 35, range_pct: [30, 40], direction: hold}
+    - {asset: VXUS, weight_pct: 15, range_pct: [10, 20], direction: hold}
+    - {asset: BTC, weight_pct: 5, range_pct: [4, 7], direction: hold}
+    - {asset: ETH, weight_pct: 3, range_pct: [2, 5], direction: hold}
+    - {asset: individual_stocks, weight_pct: 20, range_pct: [15, 25], direction: hold}
+    - {asset: USDC_yield, weight_pct: 15, range_pct: [10, 20], direction: hold}
+    - {asset: cash, weight_pct: 7, range_pct: [5, 10], direction: trim}
+  asset_options: [VTI, VOO, VXUS, BND, BTC, ETH, SOL, USDC, USDT, NVDA, GOOG, TSLA, MSFT, AMZN, Cash, Other]
+  idle_cash_pct_options: [5, 10, 15, 20]
+  custodial_concentration_pct_options: [5, 10, 15]
+  example_overlap_groups:
+    - tickers: [VTI, VOO, VO, VTV, ITOT]
+      consolidation_target: VTI
+
+platforms:
+  brokers_options: [IBKR, Schwab, Fidelity, Trading212, Revolut, Other]
+  crypto_exchanges_options: [Binance, Coinbase, Kraken, Bybit, Bitget, MEXC, KuCoin, CoinEx, Other]
+  stablecoin_yield_options: [None, Binance Earn, Coinbase, Bitget, MEXC, CoinEx, Aave, Other]
+  wallets_options: [Wise, Revolut, Bank account, Hardware wallet, MetaMask, Other]
+  options_venue_options: [None, IBKR options, Deribit, Tastytrade, Other]
+  custodial_concern_default: medium
+
+patterns:
+  output_language_options: [en, ru, es, de, fr, pt, mixed]
+  output_format_options: [dense_quantitative, prose, bullet, mixed]
+  default_principles:
+    - {id: foreign_cash_drag, rule: "idle foreign-currency cash = drag; deploy systematically"}
+    - {id: platform_over_timing, rule: "platform choice (FX rate, fee) > timing for execution"}
+    - {id: dca_during_fear, rule: "DCA during fear; trim into euphoria"}
+  research_window_defaults:
+    macro: {days: 30}
+    equities: {days: 14}
+    crypto: {days: 7}
+    fx: {days: 7}
+    yield: {days: 7}
+
+on_horizon:
+  active_plan_options: [ETF consolidation, Foreign-cash deployment, Stablecoin rotation, Allocation gap close, Tax optimization, Options strategy, Other]

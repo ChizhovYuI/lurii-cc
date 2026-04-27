@@ -1,0 +1,12 @@
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Built plugin archives
+*.plugin

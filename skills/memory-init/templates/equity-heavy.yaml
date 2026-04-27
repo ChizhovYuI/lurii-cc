@@ -1,0 +1,56 @@
+archetype: equity-heavy
+description: Index/ETF investor. Equities-first. Modest or zero crypto. Tax-advantaged accounts likely.
+
+profile:
+  region_options: [US resident, EU resident, UK resident, Canada resident, AU/NZ resident, Asia non-resident, Other]
+  goal_options: [Retirement at standard age, FIRE, Wealth growth, Income replacement]
+  horizon_options: ["<5y", "5-10y", "10-15y", "15-25y", "25y+"]
+  risk_options: [Conservative, Moderate, Aggressive, Very aggressive]
+  experience_options: ["<2y", "2-5y", "5-10y", "10y+"]
+  base_currency_default: USD
+  foreign_currencies_examples: [EUR, GBP, CAD, AUD, JPY, CHF]
+  income_monthly_usd_options: ["<3000", "3000-6000", "6000-10000", "10000-20000", "Other"]
+  invest_monthly_usd_options: ["<1000", "1000-2000", "2000-5000", "Other"]
+  expenses_monthly_usd_options: ["<2000", "2000-4000", "4000-8000", "Other"]
+  buffer_amount_options: ["<5000", "5000-10000", "10000-25000", "Other"]
+  portfolio_size_usd_options: ["<25000", "25000-100000", "100000-500000", "500000+"]
+  rebalance_cadence_options: [Monthly, Quarterly, Annual, Ad_hoc, Never]
+
+targets:
+  template_targets:
+    - {asset: VTI, weight_pct: 50, range_pct: [45, 55], direction: hold}
+    - {asset: VXUS, weight_pct: 30, range_pct: [25, 35], direction: hold}
+    - {asset: BND, weight_pct: 15, range_pct: [10, 20], direction: hold}
+    - {asset: REIT, weight_pct: 5, range_pct: [0, 10], direction: hold}
+  asset_options: [VTI, VOO, VXUS, IXUS, BND, AGG, VEA, VWO, REIT, VNQ, Cash, Other]
+  idle_cash_pct_options: [5, 10, 15, 20]
+  custodial_concentration_pct_options: [0, 5, 10]
+  example_overlap_groups:
+    - tickers: [VTI, VOO, VO, VTV, ITOT]
+      consolidation_target: VTI
+    - tickers: [VXUS, IXUS, VEU]
+      consolidation_target: VXUS
+
+platforms:
+  brokers_options: [IBKR, Schwab, Fidelity, Vanguard, "E*TRADE", Robinhood, Trading212, Revolut, Other]
+  crypto_exchanges_options: [None, Coinbase, Kraken, Binance, Other]
+  stablecoin_yield_options: [None, Coinbase, Other]
+  wallets_options: [Bank account, Wise, Revolut, PayPal, Other]
+  options_venue_options: [None, IBKR options, Tastytrade, Other]
+  custodial_concern_default: low
+
+patterns:
+  output_language_options: [en, ru, es, de, fr, mixed]
+  output_format_options: [dense_quantitative, prose, bullet, mixed]
+  default_principles:
+    - {id: low_cost_indexing, rule: "low expense-ratio index funds beat active over long horizons"}
+    - {id: tax_efficient_placement, rule: "place tax-inefficient assets in tax-advantaged accounts"}
+    - {id: stay_the_course, rule: "do not time the market; rebalance on schedule"}
+  research_window_defaults:
+    macro: {days: 30}
+    equities: {days: 14}
+    fx: {days: 7}
+    yield: {days: 7}
+
+on_horizon:
+  active_plan_options: [Tax-loss harvesting, ETF consolidation, Rebalance to target, Dividend reinvestment, IRA contribution, "401k contribution review", Other]

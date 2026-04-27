@@ -1,0 +1,53 @@
+archetype: crypto-native
+description: Crypto-first portfolio. BTC/ETH core, altcoins, stablecoin yield, DeFi. Equities are secondary or absent.
+
+profile:
+  region_options: [US resident, EU resident, UK resident, Asia non-resident, LATAM resident, Africa resident, Other]
+  goal_options: [Wealth growth, FIRE, Income replacement, Long-term store of value]
+  horizon_options: ["<3y", "3-7y", "7-15y", "15y+"]
+  risk_options: [Moderate, Aggressive, Very aggressive]
+  experience_options: ["<2y", "2-5y", "5-10y", "10y+"]
+  base_currency_default: USD
+  foreign_currencies_examples: [EUR, GBP, RUB, BRL, ARS, INR, CNY]
+  income_monthly_usd_options: ["<2000", "2000-5000", "5000-10000", "Other"]
+  invest_monthly_usd_options: ["<500", "500-2000", "2000-5000", "Other"]
+  expenses_monthly_usd_options: ["<1500", "1500-3500", "3500-7000", "Other"]
+  buffer_amount_options: ["<3000", "3000-7500", "7500-15000", "Other"]
+  portfolio_size_usd_options: ["<10000", "10000-50000", "50000-250000", "250000+"]
+  rebalance_cadence_options: [Monthly, Quarterly, Ad_hoc, Never]
+
+targets:
+  template_targets:
+    - {asset: BTC, weight_pct: 40, range_pct: [35, 50], direction: hold}
+    - {asset: ETH, weight_pct: 25, range_pct: [20, 30], direction: hold}
+    - {asset: SOL, weight_pct: 10, range_pct: [5, 15], direction: hold}
+    - {asset: USDC_yield, weight_pct: 20, range_pct: [15, 30], direction: hold}
+    - {asset: altcoin_basket, weight_pct: 5, range_pct: [0, 10], direction: hold}
+  asset_options: [BTC, ETH, SOL, BNB, AVAX, MATIC, LINK, ATOM, DOT, USDT, USDC, DAI, Cash, Other]
+  idle_cash_pct_options: [5, 10, 15]
+  custodial_concentration_pct_options: [10, 20, 30]
+  example_overlap_groups: []
+
+platforms:
+  brokers_options: [None, IBKR, Robinhood, Other]
+  crypto_exchanges_options: [Binance, Coinbase, Kraken, Bybit, OKX, Bitget, MEXC, KuCoin, CoinEx, Bitstamp, Other]
+  stablecoin_yield_options: [Binance Earn, Coinbase, Bitget, MEXC, CoinEx, Aave, Compound, Spark, Pendle, Other]
+  wallets_options: [Hardware wallet (Ledger/Trezor), MetaMask, Phantom, Trust Wallet, Rabby, Wise, Bank account, Other]
+  options_venue_options: [None, Deribit, "Aevo", "Lyra", IBKR options, Other]
+  custodial_concern_default: high
+
+patterns:
+  output_language_options: [en, ru, es, pt, zh, mixed]
+  output_format_options: [dense_quantitative, prose, bullet, mixed]
+  default_principles:
+    - {id: cold_storage_majority, rule: "majority of BTC/ETH in cold storage; only working capital on exchanges"}
+    - {id: stablecoin_diversification, rule: "spread stablecoin yield across 2+ venues to limit single-venue blowup risk"}
+    - {id: dca_during_fear, rule: "DCA into majors during fear; trim into euphoria"}
+  research_window_defaults:
+    macro: {days: 30}
+    crypto: {days: 7}
+    fx: {days: 14}
+    yield: {days: 7}
+
+on_horizon:
+  active_plan_options: [Cold-storage migration, Stablecoin yield rotation, Altcoin trim, DeFi position review, "L2 bridging", Tax reporting, Options strategy, Other]
