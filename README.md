@@ -6,7 +6,7 @@ Claude Code marketplace plugin for **Lurii Finance** personal portfolio manageme
 
 ### Skills
 
-- **portfolio-advisor** — produces a Russian-language quantitative portfolio review with ranked, sourced recommendations. After data + research are collected, surfaces ambiguities to the user via `AskUserQuestion` (cash anomalies, news with directional ambiguity, horizon items awaiting decision) before writing the report. Saves to `reports/advisor-YYYY-MM-DD.md` AND opens it as a Cowork artifact in the right-side pane (id `advisor-YYYY-MM-DD`); same-day re-runs update the existing artifact. Hands off all `memory/` writes to `memory-curator` at the end. Triggers: "проанализируй портфель", "monthly report", "rebalance", "what should I buy".
+- **portfolio-advisor** — produces a ranked, sourced quantitative portfolio review. Output language and every user-specific value (tickers, currencies, platforms, thresholds, recommendation buckets) come from the workspace's `memory/` folder — nothing is hardcoded. After data + research are collected, surfaces ambiguities to the user via `AskUserQuestion` (cash anomalies, news with directional ambiguity, horizon items awaiting decision) before writing the report. Saves to `reports/advisor-YYYY-MM-DD.md` AND opens it as a Cowork artifact in the right-side pane (id `advisor-YYYY-MM-DD`); same-day re-runs update the existing artifact. Hands off all `memory/` writes to `memory-curator` at the end. Triggers: "analyze portfolio", "monthly report", "rebalance", "what should I buy".
 - **memory-init** — first-time interactive setup of the `memory/` folder (profile, targets, platforms, patterns, on-horizon). Walks the user through structured questions and writes the five files. Triggers: "initialize memory", `/memory-init`, missing/empty `memory/`.
 - **memory-curator** — incremental updates to `memory/` when the user shares profile changes, target changes, executed plans, new platforms, etc. Minimal diffs, CHANGELOG entries, confirms before destructive edits. Also receives handoffs from `portfolio-advisor` after each report. Triggers: "update memory", "remember X", "target changed", "ITOT sold".
 - **categorization-curator** — iterates on `lurii-finance` type/category rules end-to-end through the MCP. Fixes `unknown` types, fills missing categories, dedups overlapping rules, links missed cross-source transfers. Always dry-runs before create; confirms before delete. Never writes SQL directly. Triggers: "categorize", "fix unknowns", "audit categories", "rule cleanup", "dedup rules", "link transfer", `/categorize`.
@@ -84,7 +84,7 @@ Run `memory-init` once on a fresh workspace; `portfolio-advisor` and `memory-cur
 
 - Memory files live in the user's workspace folder, not in the plugin.
 - Reports are written to `reports/` in the active workspace folder, dated `advisor-YYYY-MM-DD.md`. The Cowork artifact uses the same id (`advisor-YYYY-MM-DD`).
-- Language: portfolio reports are in Russian by default (per workspace `memory/patterns.md`); skill bodies and CHANGELOG are in English.
+- Language: report narrative follows `memory/patterns.md output_language` (configurable per workspace; if unset, the skill asks once and persists via `memory-curator`). Tickers, platform names, and acronyms keep their `ticker_language` form (default English). Skill bodies and CHANGELOG are in English.
 
 ## Related repos
 

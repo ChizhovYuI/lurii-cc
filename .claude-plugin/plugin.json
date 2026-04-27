@@ -1,7 +1,7 @@
 {
   "name": "lurii-cc",
   "version": "0.0.1",
-  "description": "Personal portfolio management for Lurii Finance: portfolio-advisor produces a Russian-language quantitative review (with a clarify-via-AskUserQuestion step + memory-curator handoff) and renders it as a live Cowork artifact. memory-init bootstraps memory/; memory-curator keeps it up to date. categorization-curator iterates on lurii-finance type/category rules — fixes unknowns, audits dead/shadowed rules, dedups, links cross-source transfers via validate + dry-run + confirm. Bundles the lurii-finance MCP server (pfm-mcp).",
+  "description": "Personal portfolio management plugin for Lurii Finance. portfolio-advisor produces a ranked, sourced quantitative review (with a clarify-via-AskUserQuestion step + memory-curator handoff) and renders it as a live Cowork artifact — output language and all user-specific values (tickers, currencies, platforms, thresholds) are driven by the workspace's `memory/` folder. memory-init bootstraps memory/; memory-curator keeps it up to date. categorization-curator iterates on lurii-finance type/category rules — fixes unknowns, audits dead/shadowed rules, dedups, links cross-source transfers via validate + dry-run + confirm. Bundles the lurii-finance MCP server (pfm-mcp).",
   "author": {
     "name": "Iurii Chizhov"
   },
