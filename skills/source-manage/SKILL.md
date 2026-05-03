@@ -49,10 +49,11 @@ For `add`: this confirms the user isn't about to create a duplicate name. For `e
 
 ### 2A. Add
 
-1. Ask for the **source type**. Call `mcp__lurii-finance__get_source_schema` (no arg) to get the full type map. There are ~18 supported types — too many for an `AskUserQuestion` picker (it caps at 4 options). Render the returned type names inline as a code block first, e.g.:
+1. Ask for the **source type**. Call `mcp__lurii-finance__get_source_schema` (no arg) to get the full type map. There are ~21 supported types — too many for an `AskUserQuestion` picker (it caps at 4 options). Render the returned type names inline as a code block first, e.g.:
    ```
-   Supported types: okx, binance, binance_th, bybit, cash, coinex, mexc, mexc_earn,
-   bitget_wallet, lobstr, blend, wise, kbank, ibkr, rabby, revolut, yo, emcd
+   Supported types: okx, binance, binance_th, bybit, bunq, cash, coinex, mexc,
+   mexc_earn, bitget_wallet, lobstr, blend, wise, kbank, ibkr, rabby, revolut,
+   trading212, yo, emcd, generic
    ```
    Then a single `AskUserQuestion`: if the user's original request mentioned a type (e.g. "add a wise source"), offer it as a 2-option picker (`<hint>` / `cancel`) and let the free-text "Other" carry any other choice. If no hint, skip the picker and ask for the type as free text directly. Validate the picked value against the schema's keys; on mismatch, surface `valid_types` from a follow-up `get_source_schema(source_type=<picked>)` error.
 2. Call `get_source_schema(source_type=<picked>)` to get `fields`. Each field: `name`, `prompt`, `required`, `default`, `secret`, `tip`.
