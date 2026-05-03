@@ -1,6 +1,6 @@
 ---
 name: memory-curator
-description: Curate the `memory/` folder when the user shares updates about profile, allocation targets, platforms, principles, or on-horizon items. Edits both YAML frontmatter (canonical for skill consumption) and the markdown body (human prose). Use when the user says "update memory", "remember X", "target changed", "I sold/bought Z", "new platform", "mark Y as executed", invokes /memory-update, or otherwise asks to record, correct, or retire context that belongs in `memory/`. Also use when you (Claude) detect a correction worth persisting across sessions.
+description: Incremental updates to `memory/` (profile, targets, platforms, patterns, on-horizon). Edits YAML frontmatter + markdown body via `Edit`, appends `CHANGELOG.md`, confirms before destructive edits. Also receives handoffs from `portfolio-advisor`. Use when the user says "update memory", "remember X", "target changed", "I sold/bought Z", "new platform", "mark Y executed", or invokes /memory-update.
 ---
 
 # Memory Curator

@@ -10,14 +10,14 @@ Claude Code marketplace plugin for **Lurii Finance** personal portfolio manageme
 - **memory-init** — first-time interactive setup of the `memory/` folder (profile, targets, platforms, patterns, on-horizon). Walks the user through structured questions and writes the five files. Triggers: "initialize memory", `/memory-init`, missing/empty `memory/`.
 - **memory-curator** — incremental updates to `memory/` when the user shares profile changes, target changes, executed plans, new platforms, etc. Minimal diffs, CHANGELOG entries, confirms before destructive edits. Also receives handoffs from `portfolio-advisor` after each report. Triggers: "update memory", "remember X", "target changed", "ITOT sold".
 - **categorization-curator** — iterates on `lurii-finance` type/category rules end-to-end through the MCP. Fixes `unknown` types, fills missing categories, dedups overlapping rules, links missed cross-source transfers. Always dry-runs before create; confirms before delete. Never writes SQL directly. Triggers: "categorize", "fix unknowns", "audit categories", "rule cleanup", "dedup rules", "link transfer", `/categorize`.
+- **cash-update** — updates the manual cash balance per fiat currency through the MCP. Reads current state, asks per-currency amounts, shows a before/after diff, writes via `set_cash_balance` after confirmation. Halts cleanly when the cash source is missing or ambiguous. Triggers: "update cash", "set my cash", "I have $X in cash", "log cash", `/cash-update`.
+- **source-manage** — adds, edits, renames, or deletes data sources in the lurii-finance MCP. Schema-driven cred entry via `get_source_schema`; never echoes secret values; rename preserves historical tx/snap (FK on `source_id`); cascade delete requires a second type-the-name confirmation. Triggers: "add source", "rename source", "rotate API key", "edit source", "remove source", "disable source", `/source-manage`.
 
 The `memory/` folder in your workspace is the **single source of truth** for investor profile, targets, platforms, and on-horizon plans. The skills no longer mirror state to the MCP-side AI report memory.
 
 ### MCP server
 
-`lurii-finance` is wired to the `pfm-mcp` binary on the user's `PATH`. The skills depend on it for portfolio data and categorization:
-
-`get_portfolio_summary`, `get_allocation`, `get_yield_positions`, `get_yield_history`, `get_currency_exposure`, `get_risk_metrics`, `get_pnl`, `get_transactions`, `get_snapshots`, `get_sources`, `categorization_summary`, `list_*_rules`, `dry_run_*_rule`, `create_*_rule`, `delete_*_rule`, `apply_categorization`, `set_transaction_category`, `list_categories`.
+`lurii-finance` is wired to the `pfm-mcp` binary on the user's `PATH`. The skills depend on it for portfolio data, categorization, cash, and source CRUD. Run `/mcp` in Claude Code (or list via `mcp__lurii-finance__*`) for the current tool surface.
 
 ### Web research
 
@@ -33,6 +33,7 @@ The `memory/` folder in your workspace is the **single source of truth** for inv
   ```
   brew install ChizhovYuI/lurii/lurii-pfm
   ```
+  Minimum version: **`lurii-pfm` >= 0.23.0** (the `cash-update` and `source-manage` skills need MCP tools added in that release: `list_supported_fiat_currencies`, `get_cash_balance`, `set_cash_balance`, `get_source_schema`, `add_source`, `update_source`, `delete_source`). The other skills work on `0.22.x`.
 - The skills assume a workspace folder containing `memory/` and `reports/` at its root. Open whichever folder you want to use as the portfolio root before invoking the skills.
 - `WebSearch` and `WebFetch` should be allowed in Cowork (they typically are by default).
 
@@ -60,7 +61,7 @@ cd lurii-cc
 zip -r lurii-cc.plugin .claude-plugin .mcp.json README.md skills
 ```
 
-Then double-click the `.plugin` file in Cowork, or drop it into a chat. After install, the skills appear as `lurii-cc:portfolio-advisor`, `lurii-cc:memory-curator`, `lurii-cc:memory-init`, `lurii-cc:categorization-curator` in the skill list.
+Then double-click the `.plugin` file in Cowork, or drop it into a chat. After install, the skills appear as `lurii-cc:portfolio-advisor`, `lurii-cc:memory-curator`, `lurii-cc:memory-init`, `lurii-cc:categorization-curator`, `lurii-cc:cash-update`, `lurii-cc:source-manage` in the skill list.
 
 ## Workspace layout
 
