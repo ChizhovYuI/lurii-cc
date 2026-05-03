@@ -7,7 +7,7 @@ description: Update the user's manual cash balance via lurii-finance MCP. Reads 
 
 Mechanism only. Drives the `lurii-finance` MCP cash tools through a confirm-before-write flow. **Read current balance first. Confirm the diff. Halt loud on missing cash source.**
 
-**Requires `pfm-mcp` >= 0.23.0** (cash MCP tools `list_supported_fiat_currencies`, `get_cash_balance`, `set_cash_balance`). On older builds the tool calls in Step 0 will fail with "Unknown tool" — halt and instruct the user to upgrade `lurii-pfm`.
+**Requires `pfm-mcp` >= 0.22.9** (cash MCP tools `list_supported_fiat_currencies`, `get_cash_balance`, `set_cash_balance`). On older builds the tool calls in Step 0 will fail with "Unknown tool" — halt and instruct the user to upgrade `lurii-pfm`.
 
 ## Hard rules
 
