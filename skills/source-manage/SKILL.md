@@ -7,7 +7,7 @@ description: Add, edit, rename, or delete data sources in the lurii-finance MCP.
 
 Mechanism only. Drives the `lurii-finance` MCP source CRUD tools through a discover → confirm → write loop. **Never write without an explicit confirmation. Never log credential values back to the user. Cascade delete requires a second confirmation.**
 
-**Requires `pfm-mcp` >= 0.23.0** (source CRUD MCP tools `get_source_schema`, `add_source`, `update_source`, `delete_source` plus the existing `list_sources`, `get_collect_status`, `trigger_collect`). On older builds the tool calls in Step 1 / Step 2 will fail with "Unknown tool" — halt and instruct the user to upgrade `lurii-pfm`.
+**Requires `pfm-mcp` >= 0.22.9** (source CRUD MCP tools `get_source_schema`, `add_source`, `update_source`, `delete_source` plus the existing `list_sources`, `get_collect_status`, `trigger_collect`). On older builds the tool calls in Step 1 / Step 2 will fail with "Unknown tool" — halt and instruct the user to upgrade `lurii-pfm`.
 
 ## Hard rules
 

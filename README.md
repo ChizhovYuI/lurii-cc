@@ -33,7 +33,7 @@ The `memory/` folder in your workspace is the **single source of truth** for inv
   ```
   brew install ChizhovYuI/lurii/lurii-pfm
   ```
-  Minimum version: **`lurii-pfm` >= 0.23.0** (the `cash-update` and `source-manage` skills need MCP tools added in that release: `list_supported_fiat_currencies`, `get_cash_balance`, `set_cash_balance`, `get_source_schema`, `add_source`, `update_source`, `delete_source`). The other skills work on `0.22.x`.
+  Minimum version: **`lurii-pfm` >= 0.22.9** (the `cash-update` and `source-manage` skills need MCP tools added in that release: `list_supported_fiat_currencies`, `get_cash_balance`, `set_cash_balance`, `get_source_schema`, `add_source`, `update_source`, `delete_source`). Earlier `0.22.x` releases ship the other four skills.
 - The skills assume a workspace folder containing `memory/` and `reports/` at its root. Open whichever folder you want to use as the portfolio root before invoking the skills.
 - `WebSearch` and `WebFetch` should be allowed in Cowork (they typically are by default).
 
