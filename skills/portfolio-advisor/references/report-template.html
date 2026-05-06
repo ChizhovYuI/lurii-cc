@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<!--
+  Portfolio-Advisor Cowork HTML report template
+  ============================================
+  Self-contained HTML rendered via mcp__cowork__create_artifact.
+
+  HOW TO USE:
+  1. Copy this file. Replace every {{PLACEHOLDER}} with actual data.
+  2. For repeated rows (events, holdings, recs, drift cards) duplicate the
+     example block as many times as needed — each example below shows ONE row.
+  3. Optional sections are wrapped in <!-- OPTIONAL --> comments; remove the
+     block (and outer wrapper) if not needed (e.g. no corrections this run).
+  4. Translate static labels (h2, captions like "Buffer", "Net Worth") to
+     `patterns.output_language`. Keep tickers / platform names / acronyms
+     (FX, HHI, APY, T-bill, NFP, FOMC) in `ticker_language`.
+  5. Keep all CSS inline and identical across reports — visual consistency
+     is part of the contract.
+  6. Mobile fallback: media query at the bottom collapses 2-col grids to
+     1-col below 600px. Don't change unless redesigning.
+
+  CSS class catalog: see `cowork-html-style.md`.
+-->
+<html lang="{{LANG}}">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Портфельный отчёт — {{REPORT_DATE}}</title>
+<style>
+  :root { color-scheme: light; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    color: #1a1a1a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  main { max-width: 820px; margin: 0 auto; padding: 28px 36px; }
+  h1 { font-size: 24px; font-weight: 500; margin: 0 0 16px; line-height: 1.25; }
+  h2 { font-size: 18px; font-weight: 500; margin: 28px 0 10px; line-height: 1.3; border-bottom: 1px solid #ececec; padding-bottom: 4px; }
+  h3 { font-size: 15px; font-weight: 500; margin: 20px 0 8px; line-height: 1.35; }
+  p { margin: 8px 0; }
+  ul { margin: 8px 0 8px 22px; padding: 0; }
+  li { margin: 4px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+  th, td { border: 1px solid #e5e5e5; padding: 6px 9px; text-align: left; vertical-align: top; }
+  th { background: #f9f9f9; font-weight: 500; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 13px; background: #f3f3f3; padding: 1px 5px; border-radius: 3px; }
+  a { color: #2c5cc5; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .meta { color: #666; font-size: 13px; margin-top: -6px; margin-bottom: 14px; }
+  .retracted { color: #a02020; }
+  s { color: #888; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 12px; font-weight: 500; }
+  .badge-ok { background: #e9f5e9; color: #2a6b2a; }
+  .badge-warn { background: #fff3e0; color: #8a5300; }
+  .badge-flag { background: #fde6e6; color: #8a1f1f; }
+
+  /* === Snapshot cards === */
+  .snap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0; }
+  .snap-grid-full { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 12px 0; }
+  .snap-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .snap-card h4 { margin: 0 0 12px; font-size: 10.5px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.6px; border: none; }
+  .snap-card .subtitle { color: #aaa; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; margin-left: 6px; }
+  .nw-value { font-size: 30px; font-weight: 600; color: #1a1a1a; line-height: 1; margin-bottom: 10px; font-variant-numeric: tabular-nums; letter-spacing: -0.4px; }
+  .nw-delta { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .delta-pos { color: #2a6b2a; }
+  .delta-pos::before { content: "▲ "; }
+  .delta-neg { color: #a02020; }
+  .delta-neg::before { content: "▼ "; }
+  .delta-flat { color: #888; }
+  .nw-divider { margin: 12px 0 10px; height: 1px; background: #f0f0f0; }
+  .donut-wrap { display: flex; gap: 18px; align-items: center; }
+  .donut { width: 108px; height: 108px; border-radius: 50%; position: relative; flex-shrink: 0; }
+  .donut::after { content: ''; position: absolute; top: 50%; left: 50%; width: 62px; height: 62px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); }
+  .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 1; pointer-events: none; }
+  .donut-center .dc-label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 0.4px; }
+  .donut-center .dc-value { font-size: 13px; font-weight: 600; color: #1a1a1a; font-variant-numeric: tabular-nums; }
+  .legend { font-size: 12px; flex: 1; min-width: 0; }
+  .legend-row { display: flex; align-items: center; padding: 2.5px 0; gap: 8px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .legend-name { color: #555; }
+  .legend-val { margin-left: auto; color: #1a1a1a; font-variant-numeric: tabular-nums; font-weight: 500; font-size: 11.5px; }
+  .bar-row { display: grid; grid-template-columns: 50px 1fr 56px 64px; gap: 8px; align-items: center; margin: 6px 0; font-size: 12px; }
+  .bar-label { font-family: ui-monospace, SFMono-Regular, monospace; font-weight: 600; color: #1a1a1a; font-size: 11.5px; }
+  .bar-track { background: #f3f3f3; height: 11px; border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .bar-pct { text-align: right; font-variant-numeric: tabular-nums; color: #1a1a1a; font-weight: 500; font-size: 11.5px; }
+  .bar-usd { text-align: right; font-variant-numeric: tabular-nums; color: #888; font-size: 10.5px; }
+  .risk-row { display: grid; grid-template-columns: 90px 1fr 78px; gap: 10px; align-items: center; margin: 8px 0; font-size: 12px; }
+  .risk-label { color: #1a1a1a; font-size: 12px; }
+  .risk-track { background: #f3f3f3; height: 8px; border-radius: 2px; overflow: hidden; position: relative; }
+  .risk-fill { height: 100%; border-radius: 2px; }
+  .risk-fill.ok { background: #5bc299; }
+  .risk-fill.warn { background: #d6a85b; }
+  .risk-fill.flag { background: #d66565; }
+  .risk-value { text-align: right; font-variant-numeric: tabular-nums; font-size: 11px; color: #555; }
+  .risk-sub { font-size: 10.5px; color: #aaa; margin-top: -3px; padding-left: 0; }
+  .split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 6px 0; }
+  .split-cell { padding: 4px 0; }
+  .split-cell .scl { font-size: 10.5px; color: #888; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .split-cell .scv { font-size: 19px; font-weight: 600; color: #1a1a1a; font-variant-numeric: tabular-nums; }
+  .split-cell .scd { font-size: 11px; color: #888; margin-top: 2px; }
+  .pill { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 10.5px; font-weight: 500; vertical-align: 1px; }
+  .pill-ok { background: #e9f5e9; color: #2a6b2a; }
+  .pill-warn { background: #fff3e0; color: #8a5300; }
+  .pill-flag { background: #fde6e6; color: #8a1f1f; }
+  .tx-card { font-size: 13px; line-height: 1.6; }
+  .tx-card .warn-line { font-size: 11.5px; color: #8a5300; background: #fff8ec; padding: 6px 10px; border-radius: 4px; margin-top: 8px; border-left: 2px solid #d6a85b; }
+
+  /* === Macro: milestone strip + cards === */
+  .ms-strip { display: flex; gap: 5px; align-items: stretch; overflow-x: auto; padding: 6px 0 4px; margin: 12px 0 8px; scrollbar-width: thin; }
+  .ms-strip::-webkit-scrollbar { height: 5px; }
+  .ms-strip::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+  .ms-card { flex: 0 0 auto; min-width: 96px; max-width: 116px; padding: 8px 10px; border-radius: 6px; border: 1px solid; font-size: 11.5px; position: relative; }
+  .ms-card .ms-date { font-size: 11px; font-weight: 600; color: #1a1a1a; font-variant-numeric: tabular-nums; }
+  .ms-card .ms-title { font-size: 10.5px; font-weight: 500; margin: 3px 0 1px; line-height: 1.2; color: #1a1a1a; }
+  .ms-card .ms-detail { font-size: 9.5px; color: #666; line-height: 1.3; }
+  .ms-card .ms-rel { font-size: 9px; color: #888; margin-top: 2px; font-weight: 600; }
+  .ms-card.passed { background: #f7f7f7; border-color: #e2e2e2; opacity: 0.78; }
+  .ms-card.upcoming { background: #fff8ec; border-color: #f3c97e; }
+  .ms-card.critical { background: #fde6e6; border-color: #f3a4a4; }
+  .ms-divider { flex: 0 0 auto; padding: 0 8px; border-left: 2px dashed #2c5cc5; display: flex; align-items: center; font-size: 9.5px; font-weight: 700; color: #2c5cc5; text-transform: uppercase; letter-spacing: 0.5px; writing-mode: vertical-rl; transform: rotate(180deg); }
+  .macro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .macro-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 12px 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .macro-card .mc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+  .macro-card h5 { margin: 0; font-size: 13px; font-weight: 600; color: #1a1a1a; }
+  .macro-card .mc-date { font-size: 10.5px; color: #888; font-variant-numeric: tabular-nums; }
+  .macro-card p { margin: 4px 0; font-size: 12px; line-height: 1.5; color: #333; }
+  .macro-card a { font-size: 11px; }
+  .event-pill { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.3px; }
+  .event-pill.done { background: #ececec; color: #666; }
+  .event-pill.upcoming { background: #fff3e0; color: #8a5300; }
+  .event-pill.critical { background: #fde6e6; color: #8a1f1f; }
+  .tbill-card { background: linear-gradient(135deg, #f5f9ff 0%, #e8f0fb 100%); border: 1px solid #c8d8ee; border-radius: 10px; padding: 14px 16px; }
+  .tbill-card .tb-label { margin: 0 0 6px; font-size: 10.5px; font-weight: 700; color: #2c5cc5; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tbill-card .big-num { font-size: 26px; font-weight: 600; color: #1a1a1a; font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 4px; }
+  .tbill-card .compare { font-size: 11.5px; color: #2a6b2a; }
+  .tbill-card .src-link { font-size: 10.5px; color: #888; margin-top: 8px; }
+  .lockdown-bar { background: #fff8ec; border-left: 3px solid #d6a85b; padding: 10px 14px; border-radius: 4px; font-size: 12px; margin: 10px 0; color: #6a4900; }
+  .lockdown-bar strong { color: #8a5300; }
+  .lockdown-bar code { background: #fff; padding: 0 4px; }
+  .takeaway { background: #f5f9ff; border-left: 3px solid #2c5cc5; padding: 10px 14px; border-radius: 4px; font-size: 12.5px; margin: 10px 0; color: #1a3a6c; line-height: 1.5; }
+  .takeaway strong { color: #1a1a1a; }
+
+  /* === Equities: gap-card + holding cards === */
+  .gap-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 14px 18px; margin: 10px 0; }
+  .gap-card h5 { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: #1a1a1a; }
+  .gap-track { position: relative; height: 28px; background: #f3f3f3; border-radius: 4px; margin: 8px 0; }
+  .gap-current { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, #5b8bd6 0%, #6e9bdc 100%); border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: #fff; font-size: 11px; font-weight: 600; }
+  .gap-target { position: absolute; top: -4px; bottom: -4px; width: 2px; background: #2a6b2a; }
+  .gap-target::before { content: 'TARGET'; position: absolute; top: -16px; left: -22px; font-size: 9px; font-weight: 700; color: #2a6b2a; letter-spacing: 0.4px; white-space: nowrap; }
+  .gap-target::after { content: ''; position: absolute; top: 50%; left: -4px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 6px solid #2a6b2a; transform: translateY(-50%); }
+  .gap-meta { display: flex; justify-content: space-between; font-size: 11.5px; color: #555; margin-top: 6px; }
+  .gap-delta { color: #a02020; font-weight: 600; }
+  .holdings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .holding-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); position: relative; }
+  .holding-card.featured { grid-column: span 2; background: linear-gradient(135deg, #fbfdff 0%, #f4f8fe 100%); border-color: #c8d8ee; }
+  .hc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .hc-ticker { font-family: ui-monospace, SFMono-Regular, monospace; font-weight: 700; font-size: 16px; color: #1a1a1a; }
+  .hc-action { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.4px; }
+  .hc-action.hold { background: #ececec; color: #555; }
+  .hc-action.add { background: #e9f5e9; color: #2a6b2a; }
+  .hc-action.trim { background: #fff3e0; color: #8a5300; }
+  .hc-action.sell { background: #fde6e6; color: #8a1f1f; }
+  .hc-action.wait { background: #e8f0fb; color: #2c5cc5; }
+  .hc-stats { display: flex; gap: 14px; align-items: baseline; font-variant-numeric: tabular-nums; }
+  .hc-usd { font-size: 17px; font-weight: 600; color: #1a1a1a; }
+  .hc-pct { font-size: 12px; color: #555; }
+  .hc-delta { font-size: 11.5px; font-variant-numeric: tabular-nums; margin-left: auto; font-weight: 600; }
+  .hc-delta.pos { color: #2a6b2a; }
+  .hc-delta.neg { color: #a02020; }
+  .hc-delta.flat { color: #888; }
+  .hc-catalyst { font-size: 11.5px; color: #444; line-height: 1.4; margin-top: 6px; padding-top: 6px; border-top: 1px solid #f0f0f0; }
+  .hc-catalyst strong { color: #1a1a1a; }
+  .hc-srcs { margin-top: 6px; font-size: 10.5px; }
+  .hc-srcs a { font-size: 10.5px; }
+
+  /* === Crypto: BTC card + F&G gauge + ETH/SOL === */
+  .crypto-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin: 12px 0; }
+  .crypto-grid-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .crypto-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .crypto-card.btc-feature { background: linear-gradient(135deg, #fff8ec 0%, #ffefd0 100%); border-color: #f3c97e; }
+  .crypto-card h5 { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+  .crypto-card .crypto-price { font-size: 22px; font-weight: 600; color: #1a1a1a; font-variant-numeric: tabular-nums; line-height: 1; }
+  .crypto-card .crypto-meta { font-size: 11px; color: #888; margin-top: 2px; }
+  .fg-gauge { display: flex; align-items: center; gap: 14px; margin: 8px 0; }
+  .fg-svg { width: 130px; height: 80px; flex-shrink: 0; }
+  .fg-info { flex: 1; }
+  .fg-value { font-size: 22px; font-weight: 600; color: #1a1a1a; font-variant-numeric: tabular-nums; line-height: 1; }
+  .fg-label { font-size: 11px; font-weight: 700; color: #d6a85b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .fg-trend { font-size: 11.5px; color: #666; margin-top: 4px; line-height: 1.4; }
+  .fg-trend strong { color: #1a1a1a; }
+  .btc-gap { margin: 10px 0; }
+  .btc-gap-track { position: relative; height: 24px; background: #f3f3f3; border-radius: 4px; overflow: hidden; }
+  .btc-gap-fill { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, #f3a64b 0%, #e89324 100%); border-radius: 4px; display: flex; align-items: center; padding-left: 8px; color: #fff; font-size: 10.5px; font-weight: 600; }
+  .btc-gap-mark { position: absolute; top: -2px; bottom: -2px; width: 1.5px; background: #555; }
+  .btc-gap-mark::after { position: absolute; top: -16px; left: -10px; font-size: 9px; font-weight: 600; color: #555; white-space: nowrap; }
+  .btc-gap-mark.t-4::after { content: '4%'; }
+  .btc-gap-mark.t-45::after { content: '4.5%'; }
+  .btc-gap-mark.t-5::after { content: '5%'; }
+  .btc-gap-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 11px; color: #555; margin-top: 6px; text-align: center; }
+  .btc-gap-meta .gap-num { font-weight: 600; color: #a02020; font-variant-numeric: tabular-nums; }
+  .breakdown-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 11.5px; border-bottom: 1px dashed #eee; align-items: center; }
+  .breakdown-row:last-child { border-bottom: none; padding-top: 8px; border-top: 1px solid #ddd; font-weight: 600; }
+  .breakdown-row .src { color: #666; }
+  .breakdown-row .val { font-variant-numeric: tabular-nums; color: #1a1a1a; }
+  .anomaly-note { background: #f9f9f9; border-left: 2px solid #aaa; padding: 8px 12px; border-radius: 4px; font-size: 11px; color: #666; line-height: 1.4; margin-top: 10px; }
+  .anomaly-note strong { color: #1a1a1a; }
+
+  /* === FX: pair cards === */
+  .fx-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .fx-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .fx-card h5 { margin: 0 0 6px; font-size: 14px; font-weight: 600; color: #1a1a1a; display: flex; justify-content: space-between; align-items: center; }
+  .fx-card .fx-pair-pill { font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 3px; letter-spacing: 0.4px; }
+  .fx-card .fx-locked { background: #fde6e6; color: #8a1f1f; }
+  .fx-card .fx-flat { background: #ececec; color: #555; }
+  .fx-rate { font-size: 24px; font-weight: 600; color: #1a1a1a; font-variant-numeric: tabular-nums; line-height: 1; margin: 4px 0; }
+  .fx-meta { font-size: 11px; color: #888; margin-bottom: 8px; }
+  .fx-range { position: relative; height: 26px; background: linear-gradient(90deg, #fde6e6 0%, #fff8ec 30%, #f5f9ff 50%, #e9f5e9 70%, #e9f5e9 100%); border-radius: 4px; margin: 8px 0 4px; }
+  .fx-range-current { position: absolute; top: -2px; bottom: -2px; width: 2.5px; background: #2c5cc5; border-radius: 1px; }
+  .fx-range-current::before { content: ''; position: absolute; top: -3px; left: -4px; width: 10px; height: 10px; background: #2c5cc5; border: 2px solid #fff; border-radius: 50%; }
+  .fx-range-current::after { content: attr(data-label); position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 600; color: #2c5cc5; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .fx-range-target { position: absolute; top: 0; bottom: 0; background: rgba(91, 194, 153, 0.25); border: 1px dashed #5bc299; border-radius: 3px; }
+  .fx-range-labels { display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-top: 18px; font-variant-numeric: tabular-nums; }
+  .fx-note { font-size: 11.5px; color: #444; line-height: 1.45; margin-top: 10px; }
+  .fx-note strong { color: #1a1a1a; }
+
+  /* === Yield heatmap matrix === */
+  .yield-matrix { display: grid; grid-template-columns: 56px repeat(5, 1fr); gap: 4px; margin: 12px 0; font-size: 11px; }
+  .ym-corner, .ym-h, .ym-r { padding: 6px 8px; }
+  .ym-h { background: #f3f3f3; font-weight: 600; text-align: center; font-size: 10.5px; color: #1a1a1a; border-radius: 4px; }
+  .ym-h .vh-sub { display: block; font-weight: 400; color: #666; font-size: 9px; margin-top: 2px; }
+  .ym-r { background: #f3f3f3; font-weight: 700; font-family: ui-monospace, SFMono-Regular, monospace; text-align: center; color: #1a1a1a; border-radius: 4px; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+  .ym-cell { padding: 6px 6px; border-radius: 4px; min-height: 50px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1px; text-align: center; position: relative; cursor: default; }
+  .ym-cell .apy { font-weight: 700; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .ym-cell .usd { font-size: 9.5px; color: #444; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .ym-cell .note { font-size: 8.5px; color: #666; }
+  .ym-cell.empty { background: #fafafa; color: #ccc; }
+  .ym-cell.empty .apy { color: #ccc; }
+  .ym-cell.heat-best { background: #c5e8d4; color: #1f5a3a; }
+  .ym-cell.heat-good { background: #d8edd0; color: #355c20; }
+  .ym-cell.heat-mid { background: #f5e8c0; color: #6a4d10; }
+  .ym-cell.heat-low { background: #f5d6c0; color: #6a3010; }
+  .ym-cell.heat-bad { background: #f5c0c0; color: #6a0a0a; }
+  .ym-cell.atcap { box-shadow: inset 0 0 0 2px #d6a85b; }
+  .ym-cell.atcap::after { content: 'AT-CAP'; position: absolute; top: 2px; right: 2px; font-size: 7.5px; font-weight: 700; color: #8a5300; background: #fff8ec; padding: 0 2px; border-radius: 1px; letter-spacing: 0.2px; }
+  .ym-cell.expiry::before { content: '⏰'; position: absolute; top: 2px; left: 2px; font-size: 9px; }
+  .ym-cell.headroom { box-shadow: inset 0 0 0 1.5px #2c5cc5; }
+  .ym-cell.headroom::after { content: 'FREE'; position: absolute; top: 2px; right: 2px; font-size: 7.5px; font-weight: 700; color: #2c5cc5; background: #f5f9ff; padding: 0 2px; border-radius: 1px; letter-spacing: 0.2px; }
+  .yield-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 10.5px; color: #555; margin: 10px 0 6px; align-items: center; }
+  .yield-legend .lg-swatch { display: inline-block; width: 11px; height: 11px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+  .yield-summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .yield-summary-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 10px 14px; }
+  .yield-summary-card .ysl { font-size: 10.5px; color: #888; text-transform: uppercase; letter-spacing: 0.4px; }
+  .yield-summary-card .ysv { font-size: 18px; font-weight: 600; color: #1a1a1a; font-variant-numeric: tabular-nums; }
+  .yield-summary-card .ysc { font-size: 11px; color: #444; margin-top: 4px; }
+
+  /* === Gap visualizers (Разрывы) === */
+  .gap-list { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .gap-item { display: grid; grid-template-columns: 130px 1fr 130px; gap: 12px; align-items: center; padding: 10px 14px; background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .gap-item .gi-name { font-size: 12.5px; font-weight: 600; color: #1a1a1a; }
+  .gap-item .gi-name small { display: block; font-size: 10.5px; color: #888; font-weight: 400; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .gap-item-bar { position: relative; height: 18px; background: #f3f3f3; border-radius: 3px; overflow: visible; }
+  .gap-item-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; }
+  .gap-item-fill.surplus { background: #f3a64b; }
+  .gap-item-fill.deficit { background: linear-gradient(90deg, #5b8bd6 0%, #6e9bdc 100%); }
+  .gap-item-fill.atlimit { background: #d6a85b; }
+  .gap-item-fill.under { background: #5bc299; }
+  .gap-item-mark { position: absolute; top: -3px; bottom: -3px; width: 1.5px; background: #2a6b2a; }
+  .gap-item-mark::after { content: 'cap'; position: absolute; top: -14px; left: -8px; font-size: 9px; font-weight: 600; color: #2a6b2a; }
+  .gap-item-mark.target::after { content: 'target'; }
+  .gap-item .gi-action { text-align: right; font-size: 11.5px; }
+  .gap-item .gi-action .ga-delta { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .gap-item .gi-action .ga-delta.neg { color: #a02020; }
+  .gap-item .gi-action .ga-delta.pos { color: #c47a00; }
+  .gap-item .gi-action .ga-delta.ok { color: #2a6b2a; }
+  .gap-item .gi-action .ga-note { font-size: 10.5px; color: #555; display: block; margin-top: 1px; }
+  .gap-item.warn { border-color: #f3c97e; background: linear-gradient(180deg, #fff 0%, #fffaef 100%); }
+  .gap-item.crit { border-color: #f3a4a4; background: linear-gradient(180deg, #fff 0%, #fff5f5 100%); }
+
+  /* === Recommendations === */
+  .rec { padding: 12px 16px; margin: 12px 0; background: #fff; border: 1px solid #e8e8e8; border-left: 4px solid #2c5cc5; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .rec h3 { margin-top: 0; margin-bottom: 8px; font-size: 14.5px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .rec.exec { border-left-color: #2a6b2a; }
+  .rec.defer { border-left-color: #d6a85b; }
+  .rec.hold { border-left-color: #aaa; }
+  .rec.retracted { border-left-color: #c44; background: #fff5f5; }
+  .rec-prio { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #2c5cc5; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .rec.exec .rec-prio { background: #2a6b2a; }
+  .rec.defer .rec-prio { background: #d6a85b; }
+  .rec.hold .rec-prio { background: #aaa; }
+  .rec.retracted .rec-prio { background: #c44; text-decoration: line-through; }
+  .rec-action-pill { font-size: 9.5px; font-weight: 700; padding: 2px 8px; border-radius: 3px; letter-spacing: 0.5px; }
+  .rec-action-pill.exec-now { background: #e9f5e9; color: #1f5a3a; }
+  .rec-action-pill.defer-pill { background: #fff3e0; color: #8a5300; }
+  .rec-action-pill.hold-pill { background: #ececec; color: #555; }
+  .rec-action-pill.retracted-pill { background: #fde6e6; color: #8a1f1f; }
+  .rec-action-pill.wait-pill { background: #e8f0fb; color: #2c5cc5; }
+  .rec-impact { margin-left: auto; font-size: 11px; color: #666; font-variant-numeric: tabular-nums; }
+  .rec-impact strong { color: #2a6b2a; }
+  .rec-impact.neg strong { color: #a02020; }
+  .rec p { font-size: 12.5px; line-height: 1.55; }
+  .rec p:first-of-type { margin-top: 0; }
+  .rec ul { font-size: 12.5px; }
+
+  /* === Drift cards (Изменения) === */
+  .drift-banner { background: #f7f7f7; border: 1px solid #e8e8e8; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #555; margin: 12px 0; }
+  .drift-banner strong { color: #1a1a1a; }
+  .drift-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 10px 0; }
+  .drift-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .drift-card .dl { font-size: 10.5px; color: #888; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; }
+  .drift-card .dv { font-size: 13px; font-variant-numeric: tabular-nums; color: #1a1a1a; font-weight: 600; }
+  .drift-card .dv .from { color: #888; text-decoration: line-through; font-weight: 400; margin-right: 4px; }
+  .drift-card .dv .arrow { color: #2c5cc5; margin: 0 4px; }
+  .drift-card .dnote { font-size: 11px; color: #555; line-height: 1.4; }
+  .drift-card.flag { background: #fffaf0; border-color: #f3c97e; }
+
+  /* === Sources columns === */
+  .sources-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .src-block { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 10px 14px; }
+  .src-block h3 { margin: 0 0 6px; font-size: 12px; font-weight: 600; color: #2c5cc5; text-transform: uppercase; letter-spacing: 0.5px; border: none; padding: 0; }
+  .src-block ul { margin: 0; padding: 0; list-style: none; }
+  .src-block li { margin: 3px 0; font-size: 11.5px; line-height: 1.4; padding-left: 14px; position: relative; }
+  .src-block li::before { content: '→'; position: absolute; left: 0; color: #ccc; }
+  .src-block a { font-size: 11.5px; }
+
+  /* === Collapsible corrections === */
+  .corrections-banner { background: linear-gradient(135deg, #fff5f5 0%, #fff8ec 50%, #f4faf0 100%); border: 1px solid #f3a4a4; border-radius: 10px; padding: 12px 16px; margin: 14px 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 12.5px; }
+  .corrections-banner .cb-icon { font-size: 22px; }
+  .corrections-banner .cb-title { font-weight: 700; color: #1a1a1a; font-size: 13px; }
+  .corrections-banner .cb-list { color: #555; flex: 1; min-width: 220px; }
+  .corrections-banner .cb-tag { display: inline-block; padding: 2px 7px; background: #fff; border-radius: 3px; font-size: 10.5px; font-weight: 600; margin: 0 4px 0 0; }
+  .corrections-banner .cb-tag.r1 { color: #a02020; border: 1px solid #f3a4a4; }
+  .corrections-banner .cb-tag.r2 { color: #8a5300; border: 1px solid #f3c97e; }
+  .corrections-banner .cb-tag.r3 { color: #2a6b2a; border: 1px solid #c8e0b8; }
+  details.correction-toggle { background: #fafafa; border: 1px solid #e8e8e8; border-radius: 8px; margin: 8px 0; overflow: hidden; }
+  details.correction-toggle[open] { background: #fff; }
+  details.correction-toggle summary { padding: 10px 14px; cursor: pointer; user-select: none; font-size: 12.5px; font-weight: 600; color: #1a1a1a; list-style: none; display: flex; align-items: center; gap: 10px; }
+  details.correction-toggle summary::-webkit-details-marker { display: none; }
+  details.correction-toggle summary::before { content: '▶'; font-size: 9px; color: #888; transition: transform 0.15s; flex-shrink: 0; }
+  details.correction-toggle[open] summary::before { transform: rotate(90deg); }
+  details.correction-toggle.r1 { border-color: #f3a4a4; }
+  details.correction-toggle.r1 summary { background: #fff5f5; color: #8a1f1f; }
+  details.correction-toggle.r2 { border-color: #f3c97e; }
+  details.correction-toggle.r2 summary { background: #fff8ec; color: #8a5300; }
+  details.correction-toggle.r3 { border-color: #c8e0b8; }
+  details.correction-toggle.r3 summary { background: #f4faf0; color: #2a6b2a; }
+  details.correction-toggle .corr-body { padding: 10px 18px 14px; border-top: 1px solid #eee; }
+  details.correction-toggle .corr-body p, details.correction-toggle .corr-body ol, details.correction-toggle .corr-body ul { font-size: 12px; }
+  details.correction-toggle .corr-body table { font-size: 11.5px; }
+
+  /* === Mobile fallback === */
+  @media (max-width: 600px) {
+    .snap-grid { grid-template-columns: 1fr; }
+    .donut-wrap { flex-direction: column; align-items: flex-start; }
+    .bar-row { grid-template-columns: 44px 1fr 50px; }
+    .bar-row .bar-usd { display: none; }
+    .gap-item { grid-template-columns: 1fr; gap: 6px; }
+    .gap-item .gi-action { text-align: left; }
+    .yield-matrix { grid-template-columns: 50px repeat(5, 1fr); font-size: 10px; }
+    .yield-matrix .ym-cell .apy { font-size: 11px; }
+    .yield-matrix .ym-cell .usd { font-size: 8.5px; }
+    .drift-grid { grid-template-columns: 1fr; }
+    .sources-grid { grid-template-columns: 1fr; }
+    .holdings-grid { grid-template-columns: 1fr; }
+    .crypto-grid, .crypto-grid-secondary, .fx-grid, .macro-grid { grid-template-columns: 1fr; }
+    .yield-summary-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>{{H1_TITLE}}</h1>
+<p class="meta">{{META_LINE}}</p>
+
+<!-- ============================================================ -->
+<!-- OPTIONAL: corrections banner + collapsible details            -->
+<!-- Omit the entire block below if no corrections this run.       -->
+<!-- Use classes r1/r2/r3 to differentiate up to 3 corrections by  -->
+<!-- severity (red/orange/green border).                           -->
+<!-- ============================================================ -->
+
+<div class="corrections-banner">
+  <span class="cb-icon">⚠️</span>
+  <div>
+    <div class="cb-title">{{CORRECTIONS_TITLE}}</div>
+    <div class="cb-list">
+      <span class="cb-tag r1">{{CORR_TAG_1}}</span> {{CORR_SUMMARY_1}}
+      <!-- repeat .cb-tag for #2, #3 if applicable -->
+    </div>
+    <div style="font-size:11px; color:#888; margin-top:4px;">{{CORR_DISCLOSURE_HINT}}</div>
+  </div>
+</div>
+
+<details class="correction-toggle r1">
+<summary>{{CORR_SUMMARY_FULL_1}} <span style="margin-left:auto; font-size:10.5px; font-weight:400; color:#888;">{{CORR_DATE_1}}</span></summary>
+<div class="corr-body">
+  {{CORR_BODY_1_HTML}}
+</div>
+</details>
+
+<!-- repeat <details class="correction-toggle r2"> and r3 if needed -->
+
+<!-- ============================================================ -->
+<!-- SECTION 1 — Snapshot                                          -->
+<!-- 6 cards: NW + buffer/investable | Categories donut            -->
+<!--          Top-5 bars             | Risk gauges                 -->
+<!--          Transactions + warnings (full-width)                 -->
+<!-- ============================================================ -->
+
+<h2>{{H2_SNAPSHOT}}</h2>
+
+<div class="snap-grid">
+
+  <!-- Net Worth featured card -->
+  <div class="snap-card">
+    <h4>{{NW_LABEL}} <span class="subtitle">{{NW_AS_OF}}</span></h4>
+    <div class="nw-value">{{NW_USD}}</div>
+    <div class="nw-delta">
+      <!-- delta-pos for ▲ / delta-neg for ▼ / delta-flat for ≈ -->
+      <span class="delta-{{DELTA_DAY_DIR}}">{{DELTA_DAY_TEXT}}</span>
+      <span class="delta-{{DELTA_WEEK_DIR}}">{{DELTA_WEEK_TEXT}}</span>
+    </div>
+    <div class="nw-divider"></div>
+    <div class="split-row">
+      <div class="split-cell">
+        <div class="scl">{{BUFFER_LABEL}}</div>
+        <div class="scv">{{BUFFER_USD}}</div>
+        <div class="scd">{{BUFFER_DETAIL}}</div>
+      </div>
+      <div class="split-cell">
+        <div class="scl">{{INVESTABLE_LABEL}}</div>
+        <div class="scv">{{INVESTABLE_USD}}</div>
+        <div class="scd">{{INVESTABLE_DETAIL}}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category donut -->
+  <div class="snap-card">
+    <h4>{{CATEGORIES_LABEL}}</h4>
+    <div class="donut-wrap">
+      <!-- conic-gradient: cumulative percentages 0..100. Stops MUST equal portfolio shares. -->
+      <div class="donut" style="background: conic-gradient(#5b8bd6 0% {{CAT1_END}}%, #d6a85b {{CAT1_END}}% {{CAT2_END}}%, #8e5bd6 {{CAT2_END}}% {{CAT3_END}}%, #5bc299 {{CAT3_END}}% {{CAT4_END}}%, #d65b8b {{CAT4_END}}% 100%);">
+        <div class="donut-center">
+          <div class="dc-label">Total</div>
+          <div class="dc-value">{{NW_SHORT}}</div>
+        </div>
+      </div>
+      <div class="legend">
+        <!-- One legend-row per category. Color must match donut stop above. -->
+        <div class="legend-row"><span class="legend-dot" style="background:#5b8bd6;"></span><span class="legend-name">{{CAT1_NAME}}</span><span class="legend-val">{{CAT1_PCT}}% · {{CAT1_USD}}</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#d6a85b;"></span><span class="legend-name">{{CAT2_NAME}}</span><span class="legend-val">{{CAT2_PCT}}% · {{CAT2_USD}}</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#8e5bd6;"></span><span class="legend-name">{{CAT3_NAME}}</span><span class="legend-val">{{CAT3_PCT}}% · {{CAT3_USD}}</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#5bc299;"></span><span class="legend-name">{{CAT4_NAME}}</span><span class="legend-val">{{CAT4_PCT}}% · {{CAT4_USD}}</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#d65b8b;"></span><span class="legend-name">{{CAT5_NAME}}</span><span class="legend-val">{{CAT5_PCT}}% · {{CAT5_USD}}</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="snap-grid">
+
+  <!-- Top-5 holdings — bar widths normalized to single_holding_max_pct (default 20%) -->
+  <div class="snap-card">
+    <h4>{{TOP5_LABEL}} <span class="subtitle">{{TOP5_SUBTITLE}}</span></h4>
+    <!-- Repeat .bar-row for each top-5 holding. Width = (pct / single_holding_cap) * 100. -->
+    <div class="bar-row">
+      <span class="bar-label">{{TICKER_1}}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:{{BAR_1_W}}%; background:{{BAR_1_COLOR}};"></div></div>
+      <span class="bar-pct">{{BAR_1_PCT}}%</span>
+      <span class="bar-usd">{{BAR_1_USD}}</span>
+    </div>
+    <!-- ... 4 more bar-rows -->
+  </div>
+
+  <!-- Risk gauges — fill width = (current / cap) * 100 -->
+  <div class="snap-card">
+    <h4>{{RISK_LABEL}} <span class="subtitle">{{RISK_SUBTITLE}}</span></h4>
+    <!-- Repeat per risk metric. Use class ok / warn / flag for risk-fill based on cap proximity. -->
+    <div class="risk-row">
+      <span class="risk-label">{{RISK_NAME_1}}</span>
+      <div class="risk-track"><div class="risk-fill ok" style="width:{{RISK_W_1}}%;"></div></div>
+      <span class="risk-value">{{RISK_VAL_1}} <span class="pill pill-ok">OK</span></span>
+    </div>
+    <div class="risk-sub" style="margin-bottom:6px; padding-left:100px;">{{RISK_SUB_1}}</div>
+    <!-- ... HHI / Single-largest / Custodial -->
+  </div>
+
+</div>
+
+<div class="snap-grid-full">
+  <div class="snap-card tx-card">
+    <h4>{{TX_LABEL}} <span class="subtitle">{{TX_SINCE}}</span></h4>
+    <p style="margin:0;">{{TX_BODY_HTML}}</p>
+    <!-- OPTIONAL: warn-line block for stale-source / anomaly notes -->
+    <div class="warn-line">⚠ {{WARN_LINE_TEXT}}</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 2 — Macro                                             -->
+<!-- Milestone strip + lockdown banner + macro cards + T-bill card -->
+<!-- ============================================================ -->
+
+<h2>{{H2_MACRO}}</h2>
+
+<!-- Milestone strip — chronological order, ms-divider between past and future -->
+<div class="ms-strip">
+  <!-- Past events: class .passed (gray, faded). Repeat .ms-card.passed per event. -->
+  <div class="ms-card passed">
+    <div class="ms-date">{{EV_PAST_DATE}}</div>
+    <div class="ms-title">{{EV_PAST_TITLE}}</div>
+    <div class="ms-detail">{{EV_PAST_DETAIL}}</div>
+    <div class="ms-rel">{{EV_PAST_REL}}</div>
+  </div>
+
+  <!-- TODAY divider (vertical dashed line + label). Always exactly one. -->
+  <div class="ms-divider">{{TODAY_LABEL}}</div>
+
+  <!-- Future events: class .upcoming (amber) or .critical (red, e.g. transitions, earnings of top holdings). -->
+  <div class="ms-card upcoming">
+    <div class="ms-date">{{EV_NEXT_DATE}}</div>
+    <div class="ms-title">{{EV_NEXT_TITLE}}</div>
+    <div class="ms-detail">{{EV_NEXT_DETAIL}}</div>
+    <div class="ms-rel">{{EV_NEXT_REL}}</div>
+  </div>
+</div>
+
+<!-- Lockdown banner: highlight FX-blocked windows + best deploy windows. -->
+<div class="lockdown-bar">
+  <strong>{{LOCKDOWN_HEADER}}</strong> {{LOCKDOWN_BODY_HTML}}
+</div>
+
+<!-- Macro detail cards: 2-col grid (some cards span both columns). -->
+<div class="macro-grid">
+
+  <div class="macro-card">
+    <div class="mc-head">
+      <span class="event-pill done">{{EV_PILL}}</span>
+      <h5>{{MACRO_CARD_TITLE}}</h5>
+      <span class="mc-date">{{MACRO_CARD_DATE}}</span>
+    </div>
+    <p>{{MACRO_CARD_BODY_HTML}}</p>
+    <p>{{MACRO_CARD_LINKS_HTML}}</p>
+  </div>
+
+  <!-- ... more macro-cards. Use grid-column: span 2 for full-width cards (e.g. transition). -->
+
+  <!-- T-bill featured card spans both columns -->
+  <div class="tbill-card" style="grid-column: span 2;">
+    <div class="tb-label">{{TBILL_LABEL}}</div>
+    <div class="big-num">{{TBILL_RATE}}</div>
+    <div class="compare">{{TBILL_COMPARE_HTML}}</div>
+    <div class="src-link">{{TBILL_SRC_HTML}}</div>
+  </div>
+
+</div>
+
+<div class="takeaway">
+  <strong>{{TAKEAWAY_LABEL}}</strong> {{TAKEAWAY_BODY_HTML}}
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 3 — Equities                                          -->
+<!-- Optional gap-card (any direction:increase target far from cap)-->
+<!-- Holdings grid — 1 featured card (top concentration / catalyst)-->
+<!-- + smaller cards for the rest. ITOT/T sells go at the end.     -->
+<!-- ============================================================ -->
+
+<h2>{{H2_EQUITIES}}</h2>
+
+<!-- OPTIONAL: gap-card for primary increase target -->
+<div class="gap-card">
+  <h5>{{GAP_TITLE}}</h5>
+  <div class="gap-track">
+    <!-- gap-current width = (current_pct / target_pct) * 100 -->
+    <div class="gap-current" style="width:{{GAP_W}}%;">{{GAP_CURRENT_TEXT}}</div>
+    <div class="gap-target" style="left:100%;"></div>
+  </div>
+  <div class="gap-meta">
+    <span>0%</span>
+    <span class="gap-delta">{{GAP_DELTA_TEXT}}</span>
+    <span>{{GAP_TARGET_TEXT}}</span>
+  </div>
+  <p style="font-size:11.5px; color:#444; margin-top:8px;">{{GAP_NOTES_HTML}}</p>
+</div>
+
+<div class="holdings-grid">
+
+  <!-- Featured holding (full-width, gradient) — typically the largest concentration with a catalyst (earnings) -->
+  <div class="holding-card featured">
+    <div class="hc-head">
+      <div>
+        <span class="hc-ticker">{{H_TICKER}}</span>
+        <span class="hc-action {{H_ACTION_CLASS}}" style="margin-left:8px;">{{H_ACTION_LABEL}}</span>
+      </div>
+      <span class="hc-delta {{H_DELTA_DIR}}">{{H_DELTA_TEXT}}</span>
+    </div>
+    <div class="hc-stats">
+      <span class="hc-usd">{{H_USD}}</span>
+      <span class="hc-pct">{{H_PCT}}% · {{H_PRICE}}</span>
+    </div>
+    <div class="hc-catalyst">{{H_CATALYST_HTML}}</div>
+    <div class="hc-srcs">{{H_SOURCES_HTML}}</div>
+  </div>
+
+  <!-- Standard holdings — 2-col. Repeat as needed. action class: hold | add | trim | sell | wait. delta dir: pos | neg | flat. -->
+  <div class="holding-card">
+    <div class="hc-head">
+      <div>
+        <span class="hc-ticker">{{H_TICKER}}</span>
+        <span class="hc-action {{H_ACTION_CLASS}}" style="margin-left:6px;">{{H_ACTION_LABEL}}</span>
+      </div>
+      <span class="hc-delta {{H_DELTA_DIR}}">{{H_DELTA_TEXT}}</span>
+    </div>
+    <div class="hc-stats">
+      <span class="hc-usd">{{H_USD}}</span>
+      <span class="hc-pct">{{H_PCT}}%</span>
+    </div>
+    <div class="hc-catalyst">{{H_CATALYST_HTML}}</div>
+  </div>
+  <!-- ... more holding-cards -->
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 4 — Crypto                                            -->
+<!-- BTC big card + F&G SVG gauge | ETH and SOL secondary cards    -->
+<!-- ============================================================ -->
+
+<h2>{{H2_CRYPTO}}</h2>
+
+<div class="crypto-grid">
+
+  <div class="crypto-card btc-feature">
+    <h5>₿ {{BTC_TICKER}} <span class="hc-action {{BTC_ACTION_CLASS}}" style="font-size:9.5px;">{{BTC_ACTION_LABEL}}</span></h5>
+    <div class="crypto-price">{{BTC_PRICE}}</div>
+    <div class="crypto-meta">{{BTC_META}}</div>
+
+    <div class="btc-gap">
+      <div class="btc-gap-track">
+        <!-- gap-fill width = (current_pct / max_target_pct) * 100. Marks at lower/mid/upper target % positions. -->
+        <div class="btc-gap-fill" style="width:{{BTC_GAP_W}}%;">{{BTC_CURRENT_TEXT}}</div>
+        <div class="btc-gap-mark t-4" style="left:{{BTC_T1_POS}}%;"></div>
+        <div class="btc-gap-mark t-45" style="left:{{BTC_T2_POS}}%;"></div>
+        <div class="btc-gap-mark t-5" style="left:{{BTC_T3_POS}}%;"></div>
+      </div>
+      <div class="btc-gap-meta">
+        <div>{{BTC_T1_LABEL}}<br><span class="gap-num">{{BTC_GAP_T1}}</span></div>
+        <div>{{BTC_T2_LABEL}}<br><span class="gap-num">{{BTC_GAP_T2}}</span></div>
+        <div>{{BTC_T3_LABEL}}<br><span class="gap-num">{{BTC_GAP_T3}}</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <!-- Per-source breakdown rows. Last row = Total (visually emphasized). -->
+      <div class="breakdown-row"><span class="src">{{BD_LABEL_1}}</span><span class="val">{{BD_VAL_1}}</span></div>
+      <div class="breakdown-row"><span class="src">{{BD_LABEL_2}}</span><span class="val">{{BD_VAL_2}}</span></div>
+      <div class="breakdown-row"><span class="src">Total</span><span class="val">{{BD_TOTAL}}</span></div>
+    </div>
+  </div>
+
+  <!-- F&G gauge -->
+  <div class="crypto-card">
+    <h5>{{FG_TITLE}}</h5>
+    <div class="fg-gauge">
+      <!--
+        SVG half-circle gauge for Fear & Greed (0..100).
+        - stroke-dashoffset = 157 - (value / 100) * 157  (pathLength=157)
+        - needle rotate angle = -180 + (value / 100) * 180   degrees, applied to <g transform="rotate(...)">.
+        Example value=41:  dashoffset = 157 - 0.41*157 ≈ 92.6;  rotate ≈ -180 + 73.8 = -106.2.
+      -->
+      <svg class="fg-svg" viewBox="0 0 130 80">
+        <defs>
+          <linearGradient id="fg-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#d66565"/>
+            <stop offset="25%" stop-color="#e89324"/>
+            <stop offset="45%" stop-color="#e8c024"/>
+            <stop offset="55%" stop-color="#a8c54a"/>
+            <stop offset="75%" stop-color="#5bc299"/>
+            <stop offset="100%" stop-color="#2a9c69"/>
+          </linearGradient>
+        </defs>
+        <path d="M 15 65 A 50 50 0 0 1 115 65" stroke="#f0f0f0" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M 15 65 A 50 50 0 0 1 115 65" stroke="url(#fg-grad)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="{{FG_DASHOFFSET}}" pathLength="157"/>
+        <g transform="translate(65,65) rotate({{FG_NEEDLE_ROTATE}})">
+          <line x1="0" y1="0" x2="0" y2="-46" stroke="#1a1a1a" stroke-width="2"/>
+          <circle cx="0" cy="0" r="3.5" fill="#1a1a1a"/>
+        </g>
+      </svg>
+      <div class="fg-info">
+        <div class="fg-value">{{FG_VALUE}}</div>
+        <div class="fg-label">{{FG_LABEL}}</div>
+        <div class="fg-trend">{{FG_TREND_HTML}}</div>
+      </div>
+    </div>
+    <p style="font-size:11.5px; color:#444; margin-top:6px; line-height:1.45;">{{FG_DCA_PLAN_HTML}}</p>
+    <div class="hc-srcs">{{FG_SOURCES_HTML}}</div>
+  </div>
+
+</div>
+
+<!-- ETH + SOL secondary cards -->
+<div class="crypto-grid-secondary">
+
+  <div class="crypto-card">
+    <h5>Ξ {{ETH_TICKER}}</h5>
+    <div class="crypto-price">{{ETH_PRICE}}</div>
+    <div class="crypto-meta">{{ETH_META}}</div>
+    <div style="margin-top:8px;">
+      <!-- per-source breakdown -->
+    </div>
+  </div>
+
+  <div class="crypto-card">
+    <h5>{{ALT_HEADER}}</h5>
+    <div class="crypto-price">{{ALT_PRICE}}</div>
+    <div class="crypto-meta">{{ALT_META}}</div>
+    <p style="font-size:11.5px; color:#444; margin-top:8px;">{{ALT_NOTE_HTML}}</p>
+  </div>
+
+</div>
+
+<!-- OPTIONAL: anomaly note (e.g. get_pnl quirk per data_quirks.transactions_truth) -->
+<div class="anomaly-note">
+  <strong>{{ANOMALY_LABEL}}</strong> {{ANOMALY_BODY_HTML}}
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 5 — FX                                                -->
+<!-- One pair-card per profile.foreign_currencies entry            -->
+<!-- ============================================================ -->
+
+<h2>{{H2_FX}}</h2>
+
+<div class="fx-grid">
+
+  <div class="fx-card">
+    <h5>
+      <span>{{FX_PAIR}} <span style="font-size:11px; color:#888; font-weight:400;">{{FX_PAIR_NICKNAME}}</span></span>
+      <!-- Use fx-locked (red) if FX deploy lockdown active for this pair, fx-flat (gray) if exposure ~0 -->
+      <span class="fx-pair-pill {{FX_STATUS_CLASS}}">{{FX_STATUS_LABEL}}</span>
+    </h5>
+    <div class="fx-rate">{{FX_RATE}}</div>
+    <div class="fx-meta">{{FX_META}}</div>
+
+    <div class="fx-range">
+      <!-- Forecast target band: left = (target_low - range_low) / range, width = (target_high - target_low) / range -->
+      <div class="fx-range-target" style="left:{{FX_TGT_LEFT}}%; width:{{FX_TGT_W}}%;"></div>
+      <!-- Current marker: left = (current - range_low) / range -->
+      <div class="fx-range-current" style="left:{{FX_CUR_LEFT}}%;" data-label="{{FX_RATE}}"></div>
+    </div>
+    <div class="fx-range-labels">
+      <span>{{FX_RANGE_LOW}}</span>
+      <span>{{FX_RANGE_MID_LABEL}}</span>
+      <span>{{FX_RANGE_HIGH}}</span>
+    </div>
+
+    <div class="fx-note">{{FX_NOTE_HTML}}</div>
+    <div class="hc-srcs">{{FX_SOURCES_HTML}}</div>
+  </div>
+
+  <!-- ... more fx-cards -->
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 6 — Stablecoin yields                                 -->
+<!-- Heatmap: rows=assets, cols=venues. Cells colored by APY tier  -->
+<!-- with at-cap / free-slot / bonus-expiry overlays.              -->
+<!-- ============================================================ -->
+
+<h2>{{H2_YIELDS}}</h2>
+
+<p style="font-size:11.5px; color:#666; margin-top:10px;">{{HEATMAP_HINT}}</p>
+
+<!--
+  Matrix grid: 1 corner + N venues (header) + M asset rows.
+  Update `grid-template-columns: 56px repeat(N, 1fr)` if venue count differs from 5.
+-->
+<div class="yield-matrix">
+  <!-- Header row -->
+  <div class="ym-corner"></div>
+  <div class="ym-h">{{V1_NAME}}<span class="vh-sub">{{V1_HINT}}</span></div>
+  <div class="ym-h">{{V2_NAME}}<span class="vh-sub">{{V2_HINT}}</span></div>
+  <div class="ym-h">{{V3_NAME}}<span class="vh-sub">{{V3_HINT}}</span></div>
+  <div class="ym-h">{{V4_NAME}}<span class="vh-sub">{{V4_HINT}}</span></div>
+  <div class="ym-h">{{V5_NAME}}<span class="vh-sub">{{V5_HINT}}</span></div>
+
+  <!-- Asset row — repeat per asset.
+       Cell classes — heat-best (≥12%) / heat-good (9–12%) / heat-mid (7–9%) / heat-low (4–7%) / heat-bad (<4%) / empty.
+       Add atcap (orange ring) for at-cap; headroom (blue ring) for free tier-1 slot; expiry (⏰) for bonus expiry. -->
+  <div class="ym-r">{{ASSET_1}}</div>
+  <div class="ym-cell {{HEAT_A1V1}} {{FLAG_A1V1}}"><span class="apy">{{APY_A1V1}}</span><span class="usd">{{USD_A1V1}}</span><span class="note">{{NOTE_A1V1}}</span></div>
+  <!-- ... more cells per venue ... -->
+
+  <!-- ... more asset rows ... -->
+</div>
+
+<div class="yield-legend">
+  <span><span class="lg-swatch" style="background:#c5e8d4;"></span>≥12% best</span>
+  <span><span class="lg-swatch" style="background:#d8edd0;"></span>9–12% good</span>
+  <span><span class="lg-swatch" style="background:#f5e8c0;"></span>7–9% mid</span>
+  <span><span class="lg-swatch" style="background:#f5d6c0;"></span>4–7% low</span>
+  <span><span class="lg-swatch" style="background:#fff8ec; box-shadow: inset 0 0 0 2px #d6a85b;"></span>at-cap</span>
+  <span><span class="lg-swatch" style="background:#f5f9ff; box-shadow: inset 0 0 0 1.5px #2c5cc5;"></span>free slot</span>
+  <span>⏰ bonus expiry</span>
+</div>
+
+<div class="yield-summary-row">
+  <div class="yield-summary-card">
+    <div class="ysl">{{YIELD_TOTAL_LABEL}}</div>
+    <div class="ysv">{{YIELD_TOTAL_VAL}}</div>
+    <div class="ysc">{{YIELD_TOTAL_NOTE}}</div>
+  </div>
+  <div class="yield-summary-card" style="background: linear-gradient(135deg, #f5f9ff 0%, #e8f0fb 100%); border-color: #c8d8ee;">
+    <div class="ysl">{{YIELD_BENCH_LABEL}}</div>
+    <div class="ysv">{{YIELD_BENCH_VAL}}</div>
+    <div class="ysc">{{YIELD_BENCH_NOTE}}</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 7 — Gaps & Risks                                      -->
+<!-- One gap-item per target / threshold from memory.              -->
+<!-- ============================================================ -->
+
+<h2>{{H2_GAPS}}</h2>
+
+<div class="gap-list">
+
+  <!-- Gap row template. Wrapper class: warn (amber) / crit (red) / (none for OK).
+       Fill class: surplus / deficit / atlimit / under.
+       Mark class: target (arrow + 'target' label) / unset (just 'cap' label). -->
+  <div class="gap-item {{GAP_WRAP_CLASS}}">
+    <div class="gi-name">{{GAP_NAME}} <small>{{GAP_NAME_SUB}}</small></div>
+    <div class="gap-item-bar">
+      <div class="gap-item-fill {{GAP_FILL_CLASS}}" style="width:{{GAP_FILL_W}}%;"></div>
+      <div class="gap-item-mark {{GAP_MARK_CLASS}}" style="left:{{GAP_MARK_POS}}%;"></div>
+    </div>
+    <div class="gi-action">
+      <span class="ga-delta {{GAP_DELTA_CLASS}}">{{GAP_DELTA_TEXT}}</span>
+      <span class="ga-note">{{GAP_NOTE}}</span>
+    </div>
+  </div>
+
+  <!-- ... repeat per gap row ... -->
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 8 — Recommendations                                   -->
+<!-- One .rec block per recommendation. Wrapper class:             -->
+<!--   exec (green border)   — "execute today / now"               -->
+<!--   defer (amber border)  — "defer to specific window"          -->
+<!--   hold (gray border)    — "hold / no action"                  -->
+<!--   retracted (red bg)    — superseded by a correction          -->
+<!-- ============================================================ -->
+
+<h2>{{H2_RECOMMENDATIONS}}</h2>
+
+<div class="rec {{REC_CLASS}}">
+  <h3>
+    <span class="rec-prio">{{REC_NUM}}</span>
+    {{REC_TITLE}}
+    <span class="rec-action-pill {{REC_PILL_CLASS}}">{{REC_PILL_LABEL}}</span>
+    <span class="rec-impact"><strong>{{REC_IMPACT_USD}}</strong> {{REC_IMPACT_NOTE}}</span>
+  </h3>
+  <p>{{REC_BODY_HTML}}</p>
+</div>
+
+<!-- ... repeat per recommendation ... -->
+
+<!-- ============================================================ -->
+<!-- SECTION 9 — Changes since last report (OPTIONAL)              -->
+<!-- Banner + drift-grid. Omit if not material per Step 7b.        -->
+<!-- ============================================================ -->
+
+<h2>{{H2_CHANGES}}</h2>
+
+<div class="drift-banner">
+  <strong>{{DRIFT_HEADER}}</strong> {{DRIFT_HEADER_BODY}}
+</div>
+
+<p style="font-size:11.5px; color:#666; margin: 10px 0 4px;">{{DRIFT_LIST_LABEL}}</p>
+
+<div class="drift-grid">
+
+  <!-- Repeat per drift. Class .flag for material drifts; default for cosmetic. -->
+  <div class="drift-card {{DRIFT_CLASS}}">
+    <div class="dl">{{DRIFT_LABEL}}</div>
+    <div class="dv"><span class="from">{{DRIFT_FROM}}</span><span class="arrow">→</span>{{DRIFT_TO}}</div>
+    <div class="dnote">{{DRIFT_NOTE_HTML}}</div>
+  </div>
+
+  <!-- ... -->
+
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 10 — Sources                                          -->
+<!-- Categorize per content. Use emoji icon prefix in h3.          -->
+<!-- ============================================================ -->
+
+<h2>{{H2_SOURCES}}</h2>
+
+<div class="sources-grid">
+
+  <div class="src-block">
+    <h3>{{SRC_CAT_ICON}} {{SRC_CAT_NAME}}</h3>
+    <ul>
+      <li><a href="{{SRC_URL}}" target="_blank" rel="noreferrer">{{SRC_TITLE}}</a></li>
+      <!-- ... -->
+    </ul>
+  </div>
+
+  <!-- ... 4–5 categories: 🏛 Macro / 📈 Equities / ₿ Crypto / 💱 FX / 💰 Yields. -->
+
+  <!-- A category can span both columns: style="grid-column: span 2;" -->
+
+</div>
+
+</main>
+</body>
+</html>

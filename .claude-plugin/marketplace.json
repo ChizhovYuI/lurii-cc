@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Personal portfolio management plugin for Lurii Finance: portfolio-advisor (memory-driven, multilingual), memory-init, memory-curator, categorization-curator, cash-update, source-manage + lurii-finance MCP.",
-    "version": "0.0.2"
+    "version": "0.0.3"
   },
   "plugins": [
     {
       "name": "lurii-cc",
       "source": "./",
       "description": "Personal portfolio management for Lurii Finance. Skills: portfolio-advisor (ranked quantitative review, memory-driven, multilingual, Cowork artifact), memory-init + memory-curator (workspace `memory/`), categorization-curator (type/category rules: dry-run, dedup, transfer linking), cash-update (per-currency manual cash with diff), source-manage (add/edit/rename/delete sources, schema-driven, cascade gated). Bundles lurii-finance MCP (pfm-mcp).",
-      "version": "0.0.2",
+      "version": "0.0.3",
       "author": {
         "name": "Iurii Chizhov"
       },

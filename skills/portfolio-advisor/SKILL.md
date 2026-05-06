@@ -145,14 +145,16 @@ Compare to the most recent prior report. Include the diff section only if at lea
 
 Write the report to the path resolved from `patterns.report_path_template` with `{date}` = today (`YYYY-MM-DD`). Create parent dirs if missing.
 
-Render per `references/report-template.md` (full section order + headings template). Translate headings to `output_language`; keep tickers/platforms in `ticker_language`.
+Render the **markdown** report per `references/report-template.md` (full section order + headings template). Translate headings to `output_language`; keep tickers/platforms in `ticker_language`.
+
+If `patterns.report_artifact_format` is `cowork`, also render an **HTML** version. Start from `references/report-template.html` — copy the file, then replace every `{{PLACEHOLDER}}` with computed values per the comments in the file. The styling (CSS, colors, classes) is fixed and identical across reports — visual consistency is part of the contract. Drop optional blocks (corrections, gap-card, lockdown banner, anomaly-note, drift section, T-bill card) when not applicable per the rules in `cowork-html-style.md`. Do NOT redesign the visual or change CSS class names; if data needs a presentation that doesn't fit the existing classes, prefer text inside an existing card over inventing new structure.
 
 ## Step 9 — Persist & hand off to memory-curator
 
 After writing the report:
 
 1. Branch on `patterns.report_artifact_format`:
-   - `cowork` — render the markdown as a self-contained HTML artifact per `references/cowork-html-style.md` and call `mcp__cowork__create_artifact` (or `update_artifact` on id collision).
+   - `cowork` — render the HTML artifact per `references/report-template.html` (CSS catalog + section schema in `references/cowork-html-style.md`) and call `mcp__cowork__create_artifact` (or `update_artifact` on id collision).
    - `inline` — return the markdown directly in chat.
    - `none` — skip artifact rendering.
 
