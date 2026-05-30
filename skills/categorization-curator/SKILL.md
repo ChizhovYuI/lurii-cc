@@ -21,7 +21,7 @@ Style: narrative in `memory/patterns.md output_language`; tool names, regex patt
 
 Run in parallel:
 
-1. `mcp__lurii-finance__categorization_summary` (no args) — per-source counts: `total`, `unknown_type`, `no_category`, `internal_transfer`.
+1. `mcp__lurii-finance__categorization_summary` (no args) — per-source counts: `total`, `unknown_type`, `no_category`, `internal_transfer`, and the split `transfer_linked` / `transfer_unpaired` (flagged but not yet linked = real transfer work remaining; drives the transfer-linking sub-flow).
 2. `mcp__lurii-finance__list_sources` (no args) — `(id, name, type, enabled, tx_count, snap_count)` per configured account. Surfaces the `source_id` values needed when an account-specific rule is in scope.
 3. `mcp__lurii-finance__list_categories` (no args) — valid category values per `tx_type`.
 4. `mcp__lurii-finance__get_rule_suggestions` with `min_evidence: 2` — patterns the user has manually confirmed via prior `set_transaction_category` calls. Server-side filtering already drops non-discriminating suggestions (same `(source_type, field, value)` mapping to >1 category). Pass `include_non_discriminating: true` only when auditing why a suspected pattern is missing — output then carries `non_discriminating: true` + `conflicting_categories: [...]`.
@@ -31,7 +31,7 @@ Pick the highest-pain source by `unknown_type + no_category`. If the user named 
 Surface the survey in chat as a compact table (header labels translate to `output_language`; source ids and counts stay verbatim):
 
 ```
-<header-row in output_language: source | total | unknown | no_category | transfer>
+<header-row in output_language: source | total | unknown | no_category | transfer_unpaired>
 <source-id-1>  | <total>  | <n>  | <n>  | <n>
 <source-id-2>  | <total>  | <n>  | <n>  | <n>
 ...
@@ -44,12 +44,14 @@ For the chosen source. Source-filter semantics (`source_type` vs `source_id` XOR
 - **Survey pass** (cheap): `mcp__lurii-finance__list_uncategorized_transactions` with `source: <src>`, `missing_type: false`, `missing_category: false`, `limit: 100`. Default response is `raw_keys` only — sufficient to spot which fields exist across the backlog. ~10× smaller payload than including samples.
 - **Discovery pass** (when patterns need real values): re-call with `include_raw_sample: true` and a narrower `limit` (e.g. 30–50). Returns `raw_sample` (each value truncated to 200 chars) for pattern authoring.
 - For ambiguous rows, `mcp__lurii-finance__get_transaction_detail` with the integer row `id` to see full `raw_json`, `winning_category_rule` (id, priority, field, value, result_category), and `winning_type_rule` (same shape on the type side). Either may be `null` — `winning_type_rule` is `null` when the source already supplies a concrete type and no rule fires. Use this to answer "why is this tx X" without iterating through rules.
+- **Any row, not just the backlog**: `mcp__lurii-finance__list_transactions` reaches every transaction — already-categorized rows and transfers included — each with its integer `id` and the transfer/category overlay (`category`, `category_source`, `is_internal_transfer`, `transfer_pair_id`, `transfer_detected_by`). Filters: `source`/`source_name`, `tx_type`, `category`, `start`/`end`, `search`, `is_internal_transfer`, `has_pair`, `limit`/`offset`; returns `{count, total, offset, limit, transactions}`. Use it for transfer linking, audits, and fixing already-categorized rows (`list_uncategorized_transactions` only returns the missing-type/category backlog).
 
 Group rows by `raw_keys` (and `raw_sample` on the discovery pass). Look for stable discriminators:
 
 - A field that's the same across many rows (e.g. `kind == "purchase"`) → `eq` rule on that field.
 - A field that starts with the same token (e.g. `description` begins with `FX `) → `regex` with `^FX\b`.
 - A field that contains a free-form substring → `contains`.
+- A normalized merchant token → use the virtual field `merchant_name` (derived per-source: kbank strips the volatile `Ref Xxxx` prefix and embedded ref codes from `details` to reveal the merchant; wise uses `merchant`/`payeeName`; crypto sources yield none). Prefer it over the payment-rail field (e.g. kbank `channel`, which spans dining/groceries/top-ups and produces non-discriminating suggestions). `get_rule_suggestions` already biases toward a discriminating `merchant_name`; author the rule with `field_name: "merchant_name"`.
 
 ## Step 3 — Propose & dry-run
 
@@ -93,7 +95,7 @@ kbank: unknown 87 → 4, no_category 312 → 18. Created 6 rules. Applied.
 Three conditional branches off the main loop — load `references/sub-flows.md` when the trigger fires:
 
 - **Manual override** — user says "this one transaction is wrong" → `set_transaction_category` on a single row.
-- **Transfer linking** — `categorization_summary.internal_transfer > 0` with a missed pair, or user asks to link/unlink → `link_transfer` / `unlink_transfer`.
+- **Transfer linking** — `categorization_summary.transfer_unpaired > 0`, or user asks to link/unlink → `suggest_transfer_links` → `bulk_link_transfers`; `repair_transfer_pairs` to fix asymmetric links.
 - **Rule cleanup pass** — user says "audit rules" / "dedup" → `audit_*_rules` survey + bulk-confirm deletes.
 
 ## Failure modes to avoid
@@ -104,6 +106,7 @@ Three conditional branches off the main loop — load `references/sub-flows.md` 
 - **Don't `apply_categorization` per rule.** The bulk pass itself is fast (~1k rows is essentially instant); the rule is about *not* hiding cost in iteration, not about avoiding apply. Batch several rule edits per apply call instead.
 - **Don't infer raw field meaning.** If you can't tell what `raw_json` field X represents, call `get_transaction_detail` and ask the user.
 - **Don't `contains` a pattern that needs anchoring.** "FX" as substring also matches "TAXFX1234". Use `^FX\b` instead.
-- **Don't mix `tx_id` (string) with `id` (integer).** Listing tools return both. Mutation tools (`set_transaction_category`, `link_transfer`, `unlink_transfer`) take the integer `id`.
+- **Don't mix `tx_id` (string) with `id` (integer).** Listing tools (`list_transactions`, `list_uncategorized_transactions`) return both. Mutation tools (`set_transaction_category`, `link_transfer`, `bulk_link_transfers`, `unlink_transfer`) take the integer `id`. Every row — categorized or transfer — is reachable by `id` via `list_transactions`; never guess ids.
+- **Don't hand-match transfer pairs.** Use `suggest_transfer_links` (server-side asset/amount/date matcher), not manual cross-source eyeballing. Confirm candidates with the user before `bulk_link_transfers`, and treat a `score < 1.0` as a fee/valuation gap to sanity-check.
 - **Don't skip dry-run because "the pattern looks obvious".** Overlap detection only happens through `dry_run_*_rule.overlapping_rules`.
 - **Don't write narrative in any language other than `memory/patterns.md output_language`.** Tool names, regex patterns, category values, and source names stay in `ticker_language` (default English).
