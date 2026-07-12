@@ -10,3 +10,7 @@ Thumbs.db
 
 # Built plugin archives
 *.plugin
+
+# Python
+__pycache__/
+*.pyc

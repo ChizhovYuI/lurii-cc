@@ -1,0 +1,254 @@
+{
+  "doc_title": "Finance Report — 2026-07-11",
+  "hero": {
+    "eyebrow": "ПОРТФЕЛЬНЫЙ ОТЧЁТ · 11 ИЮЛЯ 2026",
+    "net_worth": "$68,783.74",
+    "mtd": { "label": "▲ +2.00% MTD · +$1,349.97", "tone": "good" },
+    "vs": { "label": "▼ −0.91% vs 25 июня", "tone": "bad" },
+    "meta": "Deployable idle USD ~$5,621 · BTC в band 4–5% · EMCD custodial 5.78% выше cap 5%",
+    "snapshot": [
+      { "label": "БУФЕР", "value": "~$6,000", "sub": "Wise GBP + KBank THB" },
+      { "label": "СУХОЙ ПОРОХ", "value": "~$5,621", "sub": "idle USD на IBKR", "tone": "info" },
+      { "label": "АКЦИИ", "value": "68.5%", "sub": "$47,141" },
+      { "label": "EMCD DEPOSIT", "value": "5.78%", "sub": "cap 5% — превышен", "tone": "bad" }
+    ]
+  },
+  "actions": {
+    "kicker": "ГЛАВНОЕ · ЧТО ДЕЛАТЬ СЕЙЧАС",
+    "title": "Прямые действия",
+    "sub": "6 рекомендаций, ранжированы по приоритету. Одна к исполнению сейчас, остальные — отложить или держать.",
+    "featured": {
+      "num": "1",
+      "title": "Idle USD → фазировать в VTI",
+      "action_label": "EXECUTE NOW",
+      "impact_label": "Развёртываемый капитал",
+      "impact_value": "~$5,621",
+      "text": "idle USD 8.54% / $5,872 (~$5,621 на IBKR) — выручка GBP→USD FX + settle DI. VXUS на таргете, BTC в band → свободный капитал в ядро VTI, фазировано (3–4 транша ~$1,200–1,500 через цикл), не lump. Заодно консолидирует overlap. Окно 21–23 BKK.",
+      "caveat": "⚠ hawkish + risk-off + приближение Fed/BoE (28–30 июля) → фазировать; оставить ~$1–1.5k под BTC-дип / пост-FOMC вход.",
+      "tone": "good"
+    },
+    "recs": [
+      {
+        "num": "2",
+        "title": "ETF-консолидация VOO/VO/VTV → VTI",
+        "action_label": "DEFER",
+        "text": "Non-canonical $14,250 (VO $5,560 + VOO $4,898 + VTV $3,792). Разблокирован (VXUS на таргете), но tax/timing-defer. Форсированных продаж нет; весь новый equity-капитал направлять в VTI.",
+        "tone": "warn"
+      },
+      {
+        "num": "3",
+        "title": "BTC — таргет достигнут, держать",
+        "action_label": "HOLD",
+        "text": "BTC 4.66% / $3,207 — в band 4–5%, gap закрыт. Добора нет (риск overshoot >5%). Опц. DCA $150–250 только если BTC $59–60k и доля <4.4%; venue CoinEx spot.",
+        "tone": "neutral"
+      },
+      {
+        "num": "4",
+        "title": "Риск: EMCD custodial 5.78% > 5% cap",
+        "action_label": "WATCH",
+        "text": "Консолидация BTC в EMCD (+$1,030) подняла долю выше кэпа впервые. EMCD BTC 8% < CoinEx 10.53%, locked ~до ноября 2026. Не добавлять — доля снизится органически с ростом NW.",
+        "tone": "warn"
+      },
+      {
+        "num": "5",
+        "title": "OKX bonus expiry — календарный prep",
+        "action_label": "DEFER · ~08-25",
+        "text": "OKX USDT $497 @ 10.52% (bonus) — expiry ориентир ~2026-09-08; post-expiry ~1.25%. До ~25 авг проверить end-date. Если ≤ сент — мигрировать $300 → MEXC @6% или Bitget @7.19%.",
+        "tone": "warn"
+      },
+      {
+        "num": "6",
+        "title": "Опортунистические акции — пропустить",
+        "action_label": "HOLD",
+        "text": "Нового тезиса нет. ex-US через VXUS. NVDA +5% YTD отстаёт от сектора + навес DeepSeek. TSLA −3%, CRCL спекулятивно. Skip новых имён — порох в VTI-ядро.",
+        "tone": "neutral"
+      }
+    ]
+  },
+  "composition": {
+    "allocation": [
+      { "category": "stocks", "pct": 68.54 },
+      { "category": "fiat", "pct": 18.45 },
+      { "category": "crypto", "pct": 7.23 },
+      { "category": "deposit", "pct": 5.78 }
+    ],
+    "legend": [
+      { "category": "stocks", "name": "Акции", "value": "68.5% · $47,141" },
+      { "category": "fiat", "name": "Фиат", "value": "18.5% · $12,690" },
+      { "category": "crypto", "name": "Крипто", "value": "7.2% · $4,973" },
+      { "category": "deposit", "name": "Депозит EMCD", "value": "5.8% · $3,976" }
+    ],
+    "top_cap_pct": 20,
+    "top_positions": [
+      { "ticker": "VTI", "pct": 13.67, "usd": "$9,401", "category": "stocks" },
+      { "ticker": "VXUS", "pct": 12.38, "usd": "$8,515", "category": "stocks" },
+      { "ticker": "USD", "pct": 8.54, "usd": "$5,872", "category": "fiat" },
+      { "ticker": "VO", "pct": 8.08, "usd": "$5,560", "category": "stocks" },
+      { "ticker": "GBP", "pct": 7.59, "usd": "$5,222", "category": "fiat" }
+    ]
+  },
+  "market": {
+    "btc": {
+      "price": "$64,141",
+      "meta": "+3.9% vs отчёта · −49% от пика $126k",
+      "band_frac": 0.9016,
+      "totals": "0.04999 BTC · $3,207 · 4.66% NW",
+      "pill_label": "В BAND",
+      "tone": "good"
+    },
+    "fng": {
+      "value": "23",
+      "label": "EXTREME FEAR",
+      "note": "Растёт с минимума 11. ETF-потоки развернулись: приток +$46.6M, оборвав 8 недель оттоков. Добора нет.",
+      "tone": "warn"
+    },
+    "yields": {
+      "benchmark_label": "3M T-bill бенчмарк",
+      "value": "3.79%",
+      "best_label": "tier-1 стейбл",
+      "best_value": "11–13%",
+      "note": "Обгоняют T-bill на +7…+9 pp. Ротаций нет (Δ APY < 2 pp). OKX bonus expiry ~08-25."
+    }
+  },
+  "yield_matrix": {
+    "venues": [
+      { "key": "coinex", "name": "CoinEx" },
+      { "key": "mexc", "name": "MEXC" },
+      { "key": "okx", "name": "OKX", "sub": "bonus" },
+      { "key": "emcd", "name": "EMCD", "sub": "locked" },
+      { "key": "bitget", "name": "Bitget", "sub": "Savings" }
+    ],
+    "rows": [
+      {
+        "asset": "USDT",
+        "cells": {
+          "coinex": { "apy": 12.88, "usd": "$521", "note": "AT-CAP" },
+          "mexc": { "apy": 11.36, "usd": "$306", "note": "tier-1" },
+          "okx": { "apy": 10.52, "usd": "$497", "note": "~09-08" },
+          "emcd": { "apy": 12.00, "usd": "$1,922", "note": "LOCK" },
+          "bitget": { "apy": 7.19, "usd": "$0", "note": "FREE" }
+        }
+      },
+      {
+        "asset": "USDC",
+        "cells": {
+          "coinex": { "apy": 12.55, "usd": "$520", "note": "AT-CAP" },
+          "mexc": { "apy": 10.88, "usd": "$305" },
+          "okx": { "apy": 10.51, "usd": "$14", "note": "~09-08" },
+          "emcd": {},
+          "bitget": { "apy": 8.66, "usd": "$0", "note": "FREE" }
+        }
+      },
+      {
+        "asset": "BTC",
+        "cells": {
+          "coinex": { "apy": 10.53, "usd": "$550", "note": "~$91 free" },
+          "mexc": { "apy": 6.84, "usd": "$972", "note": "AT-CAP" },
+          "okx": {},
+          "emcd": { "apy": 8.00, "usd": "$1,685", "note": "LOCK" },
+          "bitget": { "apy": 1.88, "note": "collapsed" }
+        }
+      },
+      {
+        "asset": "ETH",
+        "cells": {
+          "coinex": { "apy": 11.39, "usd": "$368" },
+          "mexc": { "apy": 8.00, "usd": "$273" },
+          "okx": {},
+          "emcd": { "apy": 8.00, "usd": "$370", "note": "LOCK" },
+          "bitget": { "apy": 8.66, "usd": "$0" }
+        }
+      }
+    ],
+    "legend_note": "LOCK locked · FREE свободный слот · ⏰ bonus expiry",
+    "summary": [
+      { "label": "БЕНЧМАРК T-BILL", "value": "3.79%", "note": "tier-1 11–13% выше на +7…+9 pp. Sub-T-bill idle-стейбл больше нет (Bybit опустошён)." },
+      { "label": "РОТАЦИИ В ЦИКЛЕ", "value": "Нет", "note": "Нет Δ APY ≥ 2 pp между свободными слотами. OKX bonus expiry ~09-08 — календарный prep." }
+    ]
+  },
+  "gaps": {
+    "risk": [
+      { "label": "HHI", "value": "746", "sub": "cap 2000 pts", "tone": "good", "badge_label": "OK" },
+      { "label": "SINGLE · VTI", "value": "13.67%", "sub": "cap 20%", "tone": "good", "badge_label": "OK" },
+      { "label": "CUSTODIAL · EMCD", "value": "5.78%", "sub": "cap 5% — превышен +0.78 pp", "tone": "bad", "badge_label": "FLAG" }
+    ],
+    "list": [
+      {
+        "name": "EMCD custodial", "sub": "$3,976 / cap $3,439",
+        "bar": "over", "fill_frac": 1.0, "mark_frac": 0.8667,
+        "delta": "5.78% > 5%", "delta_tone": "bad", "tone": "bad",
+        "note": "+0.78 pp — не наращивать (Рек #4)"
+      },
+      {
+        "name": "BTC (crypto+EMCD)", "sub": "$3,207 / band $2,751–3,439",
+        "bar": "ontarget", "fill_frac": 0.9306, "mark_frac": 0.9,
+        "delta": "4.66% — в band", "delta_tone": "good", "tone": "neutral",
+        "note": "gap закрыт, добора нет (Рек #3)"
+      },
+      {
+        "name": "VXUS", "sub": "$8,515 / target $8,254",
+        "bar": "ontarget", "fill_frac": 0.9611, "mark_frac": 0.9694,
+        "delta": "12.38% ≈ 12%", "delta_tone": "good", "tone": "neutral",
+        "note": "+$261 в допуске — поддержание"
+      },
+      {
+        "name": "GBP cash", "sub": "$5,222 · порог 10%",
+        "bar": "fiat", "fill_frac": 0.7611, "mark_frac": 0.5,
+        "delta": "7.59%", "delta_tone": "warn", "tone": "warn",
+        "note": "+2.59 pp над 5% таргетом, но <10% — drag снят"
+      },
+      {
+        "name": "idle USD", "sub": "$5,872 · база",
+        "bar": "base", "fill_frac": 0.4306,
+        "delta": "8.54%", "delta_tone": "warn", "tone": "neutral",
+        "note": "deployable ~$5,621 → VTI (Рек #1)"
+      },
+      {
+        "name": "ETF overlap", "sub": "VTI+VOO+VO+VTV",
+        "bar": "over", "fill_frac": 0.65,
+        "delta": "32.3%", "delta_tone": "warn", "tone": "neutral",
+        "note": "non-canon $14,250 — defer (Рек #2)"
+      }
+    ]
+  },
+  "macro": {
+    "today_label": "СЕГОДНЯ 11.07",
+    "events": [
+      { "date": "17 июня", "title": "FOMC hold", "detail": "3.50–3.75%, hawkish dots", "rel": "−24 дн", "when": "past" },
+      { "date": "18 июня", "title": "BoE hold", "detail": "3.75%, services 3.7%", "rel": "−23 дн", "when": "past" },
+      { "date": "28–29 июля", "title": "FOMC", "detail": "hold ~79.5%; SEP нет", "rel": "+18 дн", "when": "future" },
+      { "date": "30 июля", "title": "BoE Super Thu", "detail": "драйвер GBP/USD", "rel": "+19 дн", "when": "future" }
+    ],
+    "takeaway": "Итог: Fed/BoE-кластер вне 7-дневного окна на сегодня, но приближается. FX GBP→USD уже сведён. Фон hawkish + risk-off → idle USD в акции фазировать, не lump."
+  },
+  "changes": {
+    "kicker": "vs 25 ИЮНЯ 2026",
+    "rows": [
+      {
+        "cards": [
+          { "label": "NET WORTH", "from": "$69,414", "to": "$68,784", "note": "−$630 / −0.91%, в пределах рынка", "tone": "neutral" },
+          { "label": "GBP CASH", "from": "17.44%", "to": "7.59%", "note": "−9.85 pp: FX + THB. Idle-drag снят", "tone": "warn" },
+          { "label": "BTC", "from": "3.71%", "to": "4.66%", "note": "В band: settle DI + EMCD-консолидация", "tone": "neutral" }
+        ]
+      },
+      {
+        "cards": [
+          { "label": "EMCD CUSTODIAL", "from": "4.13%", "to": "5.78%", "note": "Пробил 5%-кэп: +$1,030 locked", "tone": "warn" },
+          { "label": "IDLE USD", "from": "~$1,886", "to": "$5,872", "note": "Сухой порох от FX + DI → VTI", "tone": "neutral" },
+          { "label": "T-BILL", "from": "3.70%", "to": "3.79%", "note": "ETF-потоки развернулись в приток", "tone": "neutral" }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "tx_label": "ТРАНЗАКЦИИ · 25 ИЮНЯ → 11 ИЮЛЯ · TX-VERIFIED",
+    "tx_text": "GBP→USD FX (IBKR, 08 июля): £3,000 → ~$4,014 — Рек #1 частично. Wise→THB: £2,276 → 100k THB буфер. Bybit DI settle: $500 → 0.01 BTC выведен, Bybit опустошён. EMCD BTC +$1,030 → earn 8% (locked), подтверждено. Прочее: DRIP ~$97, EUR €319, Plasma $351.",
+    "sources": [
+      { "heading": "МАКРО / ФРС / BOE", "links": [ { "text": "CME FedWatch" }, { "text": "Polymarket" }, { "text": "Fed SEP июнь" }, { "text": "FRED DGS3MO" } ] },
+      { "heading": "АКЦИИ", "links": [ { "text": "MarketBeat NVDA" }, { "text": "TradingKey NVDA" }, { "text": "stockanalysis" } ] },
+      { "heading": "КРИПТО", "links": [ { "text": "crypto.news F&G" }, { "text": "CoinMarketCap F&G" }, { "text": "bitcoinfoundation" } ] },
+      { "heading": "FX / YIELD", "links": [ { "text": "forex.com GBP/USD" }, { "text": "EBC GBP/USD" }, { "text": "Stablecoin yields" } ] }
+    ],
+    "colophon": "Портфельный отчёт · сгенерирован 11 июля 2026 · stale-источники под порогом (ни один > 5% NAV не устарел)"
+  }
+}

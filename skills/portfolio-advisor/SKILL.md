@@ -143,20 +143,26 @@ Compare to the most recent prior report. Include the diff section only if at lea
 
 ## Step 8 — Output
 
-Write the report to the path resolved from `patterns.report_path_template` with `{date}` = today (`YYYY-MM-DD`). Create parent dirs if missing.
+Two artifacts, both keyed to today (`{date}` = `YYYY-MM-DD`). Create parent dirs if missing.
 
-Render the **markdown** report per `references/report-template.md` (full section order + headings template). Translate headings to `output_language`; keep tickers/platforms in `ticker_language`.
+1. **Markdown** — the canonical text + diff base. Write to the path from `patterns.report_path_template` (e.g. `reports/advisor-{date}.md`), per `references/report-template.md` (section order + headings). Translate headings to `output_language`; keep tickers/platforms in `ticker_language`.
 
-If `patterns.report_artifact_format` is `cowork`, also render an **HTML** version. Start from `references/report-template.html` — copy the file, then replace every `{{PLACEHOLDER}}` with computed values per the comments in the file. The styling (CSS, colors, classes) is fixed and identical across reports — visual consistency is part of the contract. Drop optional blocks (corrections, gap-card, lockdown banner, anomaly-note, drift section, T-bill card) when not applicable per the rules in `cowork-html-style.md`. Do NOT redesign the visual or change CSS class names; if data needs a presentation that doesn't fit the existing classes, prefer text inside an existing card over inventing new structure.
+2. **HTML** (when `patterns.report_artifact_format` is `cowork`) — the token-efficient render path. **Do not hand-write or copy-substitute HTML.** Emit a compact JSON data file `reports/advisor-{date}.data.json` following `references/report-data.md` (semantic values + `tone` enums only — never colors or pixel widths), then render deterministically:
+
+   ```
+   python3 "$REF/render_report.py" reports/advisor-{date}.data.json > reports/advisor-{date}.html
+   ```
+
+   `$REF` = this skill's `references/` directory (absolute path where the skill is loaded). `render_report.py` (stdlib, no deps) computes all presentation (bar widths, APY heat, tone→color) and fills `references/report-template.html`. Omit any section object to drop that block; omit optional fields (caveat, mark, note) to drop those elements. `references/report-data.example.json` is the canonical shape — rendering it reproduces the reference design exactly. Design/CSS changes live in `report-template.html` (and `render_report.py` for new derived values), never in per-report output.
 
 ## Step 9 — Persist & hand off to memory-curator
 
 After writing the report:
 
 1. Branch on `patterns.report_artifact_format`:
-   - `cowork` — render the HTML artifact per `references/report-template.html` (CSS catalog + section schema in `references/cowork-html-style.md`) and call `mcp__cowork__create_artifact` (or `update_artifact` on id collision).
+   - `cowork` — the HTML was already rendered in Step 8 (`reports/advisor-{date}.html`). Publish that file via `mcp__cowork__create_artifact` (or `update_artifact` on id collision). Do not re-render.
    - `inline` — return the markdown directly in chat.
-   - `none` — skip artifact rendering.
+   - `none` — skip artifact publishing (the `.html` still exists on disk from Step 8).
 
 2. Return to chat: one-paragraph summary in `output_language` + path to the new report file.
 
